@@ -1,0 +1,273 @@
+{
+  "stores": {
+    "FPS_KA_BLR_042": {
+      "storeId": "FPS_KA_BLR_042",
+      "name": "Fair Price Shop #42 (Gandhi Nagar)",
+      "address": "Ward 4, 3rd Cross, Gandhi Nagar, Bengaluru, Karnataka - 560009",
+      "location": "12.9716, 77.5946",
+      "contactPhone": "+919876543200",
+      "active": true
+    },
+    "FPS_KA_BLR_088": {
+      "storeId": "FPS_KA_BLR_088",
+      "name": "Fair Price Shop #88 (Indiranagar)",
+      "address": "Ward 12, 100ft Road, Indiranagar, Bengaluru, Karnataka - 560038",
+      "location": "12.9784, 77.6408",
+      "contactPhone": "+919876543201",
+      "active": true
+    }
+  },
+  "operators": {
+    "OP_101": {
+      "operatorId": "OP_101",
+      "name": "Kiran Rao",
+      "email": "operator@fps42.gov",
+      "password": "Operator@2026",
+      "storeId": "FPS_KA_BLR_042",
+      "phone": "+919876543299",
+      "active": true
+    },
+    "OP_102": {
+      "operatorId": "OP_102",
+      "name": "Meena Devi",
+      "email": "operator@fps88.gov",
+      "password": "Operator@2026",
+      "storeId": "FPS_KA_BLR_088",
+      "phone": "+919876543298",
+      "active": true
+    }
+  },
+  "commodities": {
+    "rice": {
+      "id": "rice",
+      "name": "Rice",
+      "kgPerPerson": 5.0,
+      "unit": "kg",
+      "stockKg": 500.0
+    },
+    "ragi": {
+      "id": "ragi",
+      "name": "Ragi",
+      "kgPerPerson": 5.0,
+      "unit": "kg",
+      "stockKg": 500.0
+    }
+  },
+  "cards": {
+    "RC101": {
+      "cardId": "RC101",
+      "rfidUid": "B37A4C12",
+      "headName": "Ramesh Kumar",
+      "phone": "+919876543210",
+      "address": "Ward 4, Block B, Main Street",
+      "assignedStoreId": "FPS_KA_BLR_042",
+      "category": "BPL",
+      "allocatedRiceKg": 10.0,
+      "allocatedRagiKg": 10.0,
+      "allocatedQuotaKg": 20.0,
+      "status": "Eligible",
+      "distributedThisMonth": false,
+      "lastDistributionDate": "",
+      "membersCount": 2,
+      "members": {
+        "M101_1": {
+          "memberId": "M101_1",
+          "name": "Ramesh Kumar",
+          "relation": "Head (Self)",
+          "age": 46,
+          "gender": "Male",
+          "fpId": 1,
+          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=RameshKumar&backgroundColor=b6e3f4"
+        },
+        "M101_2": {
+          "memberId": "M101_2",
+          "name": "Sunita Kumar",
+          "relation": "Spouse",
+          "age": 42,
+          "gender": "Female",
+          "fpId": 2,
+          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=SunitaKumar&backgroundColor=ffdfbf"
+        }
+      },
+      "loginCredentials": {
+        "userId": "RC101",
+        "pin": "1001",
+        "password": "User@101"
+      }
+    },
+    "RC102": {
+      "cardId": "RC102",
+      "rfidUid": "D49F2188",
+      "headName": "Rajesh Patel",
+      "phone": "+919876543211",
+      "address": "Ward 7, Plot 14, Gandhi Nagar",
+      "assignedStoreId": "FPS_KA_BLR_042",
+      "category": "AAY",
+      "allocatedRiceKg": 15.0,
+      "allocatedRagiKg": 15.0,
+      "allocatedQuotaKg": 30.0,
+      "status": "Eligible",
+      "distributedThisMonth": false,
+      "lastDistributionDate": "",
+      "membersCount": 3,
+      "members": {
+        "M102_1": {
+          "memberId": "M102_1",
+          "name": "Rajesh Patel",
+          "relation": "Head (Self)",
+          "age": 50,
+          "gender": "Male",
+          "fpId": 3,
+          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=RajeshPatel&backgroundColor=c0aede"
+        },
+        "M102_2": {
+          "memberId": "M102_2",
+          "name": "Priya Patel",
+          "relation": "Spouse",
+          "age": 47,
+          "gender": "Female",
+          "fpId": 4,
+          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=PriyaPatel&backgroundColor=ffd5dc"
+        },
+        "M102_3": {
+          "memberId": "M102_3",
+          "name": "Amit Patel",
+          "relation": "Son",
+          "age": 21,
+          "gender": "Male",
+          "fpId": 5,
+          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=AmitPatel&backgroundColor=d1d4f9"
+        }
+      },
+      "loginCredentials": {
+        "userId": "RC102",
+        "pin": "1002",
+        "password": "User@102"
+      }
+    },
+    "RC103": {
+      "cardId": "RC103",
+      "rfidUid": "71A83B5E",
+      "headName": "Suresh Sharma",
+      "phone": "+919876543212",
+      "address": "Ward 12, House 89, Subhash Nagar",
+      "assignedStoreId": "FPS_KA_BLR_088",
+      "category": "BPL",
+      "allocatedRiceKg": 20.0,
+      "allocatedRagiKg": 20.0,
+      "allocatedQuotaKg": 40.0,
+      "status": "Eligible",
+      "distributedThisMonth": false,
+      "lastDistributionDate": "",
+      "membersCount": 4,
+      "members": {
+        "M103_1": {
+          "memberId": "M103_1",
+          "name": "Suresh Sharma",
+          "relation": "Head (Self)",
+          "age": 55,
+          "gender": "Male",
+          "fpId": 6,
+          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=SureshSharma&backgroundColor=b6e3f4"
+        },
+        "M103_2": {
+          "memberId": "M103_2",
+          "name": "Geeta Sharma",
+          "relation": "Spouse",
+          "age": 51,
+          "gender": "Female",
+          "fpId": 7,
+          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=GeetaSharma&backgroundColor=ffdfbf"
+        },
+        "M103_3": {
+          "memberId": "M103_3",
+          "name": "Rahul Sharma",
+          "relation": "Son",
+          "age": 26,
+          "gender": "Male",
+          "fpId": 8,
+          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=RahulSharma&backgroundColor=c0aede"
+        },
+        "M103_4": {
+          "memberId": "M103_4",
+          "name": "Anita Sharma",
+          "relation": "Daughter",
+          "age": 23,
+          "gender": "Female",
+          "fpId": 9,
+          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=AnitaSharma&backgroundColor=ffd5dc"
+        }
+      },
+      "loginCredentials": {
+        "userId": "RC103",
+        "pin": "1003",
+        "password": "User@103"
+      }
+    }
+  },
+  "transactions": {
+    "TXN_INIT_001": {
+      "transactionId": "TXN_INIT_001",
+      "cardId": "RC101",
+      "rfidUid": "B37A4C12",
+      "consumerName": "Ramesh Kumar",
+      "beneficiaryPhone": "+919876543210",
+      "storeId": "FPS_KA_BLR_042",
+      "operatorName": "Kiran Rao",
+      "verificationMethod": "BIOMETRIC",
+      "fpTemplateId": 1,
+      "riceQuantityKg": 10.0,
+      "ragiQuantityKg": 10.0,
+      "rationQuantityKg": 20.0,
+      "distributionTimestamp": "2026-10-15 11:30:00",
+      "distributionDate": "2026-10-15",
+      "status": "SUCCESS",
+      "smsStatus": "DELIVERED"
+    }
+  },
+  "broadcast_notification": {
+    "lastTriggered": "2026-11-24 09:00:00",
+    "message": "Public Distribution Notice: Fair Price Shop #42 is now OPEN. Monthly Rice (5kg/person) & Ragi (5kg/person) distribution has commenced. Please bring your RFID Smart Card.",
+    "status": "IDLE",
+    "totalSent": 3,
+    "lastSender": "Admin"
+  },
+  "system_config": {
+    "fpsShopId": "FPS_KA_BLR_042",
+    "shopName": "Government Fair Price Center #42",
+    "currentCycle": "November 2026",
+    "calibrationFactor": 420.5,
+    "demoMode": true,
+    "demoRatio": 100,
+    "quickCalibrateCmd": false,
+    "servoClosedAngle": 0,
+    "servoOpenAngle": 60,
+    "dispenseFlowToleranceKg": 0.05,
+    "adminCredentials": {
+      "username": "admin@smartration.gov",
+      "password": "Admin@Ration2026"
+    }
+  },
+  "active_session": {
+    "deviceOnline": true,
+    "currentStep": "IDLE",
+    "currentCardId": "",
+    "currentCardUid": "",
+    "consumerName": "",
+    "storeId": "FPS_KA_BLR_042",
+    "operatorName": "Kiran Rao",
+    "authorizedBy": "",
+    "matchedFpId": 0,
+    "currentCommodity": "",
+    "quotaRiceKg": 0.0,
+    "quotaRagiKg": 0.0,
+    "quotaTargetKg": 0.0,
+    "currentWeightKg": 0.0,
+    "physicalGrams": 0.0,
+    "stage2Confirmed": false,
+    "gateStatus": "CLOSED",
+    "servoAngle": 0,
+    "message": "System Ready. Waiting for RFID Card or Store Operator Verification...",
+    "lastHeartbeat": "2026-11-25 00:15:00"
+  }
+}
