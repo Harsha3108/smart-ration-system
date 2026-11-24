@@ -13,10 +13,10 @@ An enterprise-grade, IoT-enabled Public Distribution System (e-PDS) automated di
 
 ## System Capabilities
 
-1. **Enforced Role-Based Access Control (`Admin`, `Store Operator`, `Beneficiary`):**
-   - **State Administrator (`admin`):** Full CRUD on Ration Cards, Family Members (with **Webcam Photo Capture & Image Upload**), Fair Price Shop **Stores & GPS Locations**, **Store Distribution Operators**, and **Commodity Quotas (5 kg Rice + 5 kg Ragi per person)**.
-   - **Store Distribution Operator (`operator`):** Authenticated staff assigned to a Fair Price Shop store location; looks up Ration Cards, verifies citizen photos, authorizes distribution via **Biometric Fingerprint** or **6-Digit Mobile OTP**, and monitors live dispensing.
-   - **Beneficiary Portal (`beneficiary`):** Self-service portal for households to inspect monthly Rice + Ragi quotas, enrolled biometrics, and print official receipts.
+1. **Enforced Role-Based Access Control (`Admin` & `Store Distributor` Only):**
+   - **State Administrator (`admin`):** Full CRUD on Ration Cards, Family Members (with **Webcam Photo Capture & Image Upload**), Fair Price Shop **Stores & GPS Locations**, **Store Distributors**, and **Commodity Quotas (5 kg Rice + 5 kg Ragi per person)**.
+   - **Store Distributor (`operator`):** Authenticated staff assigned to a Fair Price Shop store location; looks up Ration Cards, verifies citizen photos, authorizes distribution via **Biometric Fingerprint** or **6-Digit Mobile OTP**, and monitors live dispensing.
+   - *(Citizens do not have web logins; they present their physical RFID Ration Card at the store counter).*
 2. **Sequential Dual-Commodity Dispensing (`Rice` -> `Ragi`):**
    - **Stage 1 (Rice):** Servo opens to **60 deg**, HX711 tracks weight until `members x 5 kg`, closes at **0 deg**.
    - **Stage 2 (Vessel Swap):** Prompts on LCD & Web Dashboard; operator/citizen confirms via onboard `BOOT` button (`GPIO 0`), RFID re-tap, or Web button.
@@ -32,8 +32,8 @@ An enterprise-grade, IoT-enabled Public Distribution System (e-PDS) automated di
 
 See **[CREDENTIALS.md](CREDENTIALS.md)** for the full login directory:
 - **Super Admin:** `admin@pds.gov.in` / `Admin@2026`
-- **3 Store Distribution Operators:** `operator1@pds.gov.in` (`Operator@101`), `operator2@pds.gov.in` (`Operator@102`), `operator3@pds.gov.in` (`Operator@103`)
-- **3 Ration Cards (2, 3, 4 members):** `RC101` (`Ration@101`), `RC102` (`Ration@102`), `RC103` (`Ration@103`)
+- **3 Store Distributors:** `operator1@pds.gov.in` (`Operator@101`), `operator2@pds.gov.in` (`Operator@102`), `operator3@pds.gov.in` (`Operator@103`)
+- **3 Registered Ration Cards (2, 3, 4 members, no web login):** `RC101`, `RC102`, `RC103`
 
 ---
 

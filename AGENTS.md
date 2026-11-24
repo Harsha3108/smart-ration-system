@@ -27,8 +27,7 @@ This repository implements an end-to-end IoT **Smart Public Ration Distribution 
    - Views family member list with **member photos**, age, relation, and registered fingerprint slot IDs.
    - Verifies beneficiary via **Biometric Fingerprint** (R307) OR **Mobile OTP** (6-digit hybrid SMS + on-screen demo fallback).
    - Triggers/monitors sequential Rice $\rightarrow$ Ragi dispensing.
-3. **Beneficiary (`beneficiary`):**
-   - Self-service portal to view card eligibility, family member biometrics, commodity quotas, and printable receipts.
+*(Note: Citizens do NOT log in to the web portal; only `admin` and `operator` accounts are authenticated).*
 
 ## Coding & Contribution Conventions
 - **Zero-build Frontend:** Keep frontend compatible with static GitHub Pages hosting (no Node/Webpack build steps required for `index.html`). Use Firebase JS v8 compat SDK (`firebase-app.js`, `firebase-auth.js`, `firebase-database.js`).

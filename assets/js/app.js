@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // AUTHENTICATION GATE & ROLE ISOLATION
 // =========================================================================
 function selectLoginHint(role) {
-  ['admin', 'operator', 'beneficiary'].forEach(r => {
+  ['admin', 'operator'].forEach(r => {
     const btn = document.getElementById(`role-hint-${r}`);
     if (btn) {
       btn.className = r === role
@@ -107,12 +107,9 @@ function selectLoginHint(role) {
   if (role === 'admin') {
     idLabel.innerText = 'Administrator Email';
     idInput.placeholder = 'admin@pds.gov.in';
-  } else if (role === 'operator') {
-    idLabel.innerText = 'Store Operator Email';
-    idInput.placeholder = 'operator1@pds.gov.in';
   } else {
-    idLabel.innerText = 'Ration Card Number';
-    idInput.placeholder = 'RC101';
+    idLabel.innerText = 'Distributor Email';
+    idInput.placeholder = 'operator1@pds.gov.in';
   }
 }
 
@@ -134,7 +131,7 @@ function handleCredentialLogin(e) {
     return;
   }
 
-  // 2. Store Distribution Operator Login
+  // 2. Store Distribution Operator / Distributor Login
   const opsSource = Object.keys(currentOperators).length ? currentOperators : DEFAULT_SEED_DATA.operators;
   const op = Object.values(opsSource).find(o => o.email && o.email.toLowerCase() === id.toLowerCase() && o.password === pwd);
   if (op) {
@@ -142,15 +139,7 @@ function handleCredentialLogin(e) {
     return;
   }
 
-  // 3. Beneficiary Login
-  const cardsSource = Object.keys(currentCards).length ? currentCards : DEFAULT_SEED_DATA.cards;
-  const card = cardsSource[id.toUpperCase()];
-  if (card && card.loginCredentials && card.loginCredentials.password === pwd) {
-    completeLogin({ role: 'beneficiary', id: card.cardId, name: card.headName, storeId: card.assignedStoreId });
-    return;
-  }
-
-  errBox.innerText = 'Invalid User ID / Email or Password. Check CREDENTIALS.md and try again.';
+  errBox.innerText = 'Access denied. Only authorized Administrators or Fair Price Shop Distributors can sign in.';
   errBox.classList.remove('hidden');
 }
 
@@ -196,8 +185,8 @@ function applyAuthenticatedView() {
   document.getElementById('header-auth-controls').classList.remove('hidden');
 
   document.getElementById('header-user-name').innerText = currentUser.name;
-  const roleMap = { admin: 'Super Administrator', operator: `Operator (${currentUser.storeId})`, beneficiary: `Citizen (${currentUser.id})` };
-  document.getElementById('header-user-role').innerText = roleMap[currentUser.role] || currentUser.role;
+  const roleMap = { admin: 'Super Administrator', operator: `Distributor (${currentUser.storeId})` };
+  document.getElementById('header-user-role').innerText = roleMap[currentUser.role] || 'Authorized User';
 
   const btnBroadcast = document.getElementById('btn-broadcast-sms');
   const adminSwitcher = document.getElementById('admin-portal-switcher');
@@ -211,9 +200,7 @@ function applyAuthenticatedView() {
     adminSwitcher.classList.add('hidden');
     switchPortal('operator');
   } else {
-    btnBroadcast.classList.add('hidden');
-    adminSwitcher.classList.add('hidden');
-    switchPortal('beneficiary');
+    showLoginGate();
   }
 }
 
@@ -262,13 +249,11 @@ function initFirebaseListeners() {
     renderCards();
     updateSummaryStats();
     if (activeOperatorCardId && currentCards[activeOperatorCardId]) operatorLoadCard(activeOperatorCardId);
-    if (currentUser?.role === 'beneficiary') renderBeneficiaryPortal(currentUser.id);
   });
 
   window.db.ref('transactions').on('value', (snap) => {
     currentTransactions = snap.val() || {};
     renderTransactions();
-    if (currentUser?.role === 'beneficiary') renderBeneficiaryPortal(currentUser.id);
   });
 
   window.db.ref('active_session').on('value', (snap) => {
@@ -676,8 +661,6 @@ function openEditCardModal(cardId) {
   document.getElementById('input-phone').value = card.phone || '';
   document.getElementById('input-category').value = card.category || 'BPL';
   document.getElementById('input-address').value = card.address || '';
-  document.getElementById('input-user-login-id').value = card.loginCredentials ? card.loginCredentials.userId : cardId;
-  document.getElementById('input-user-password').value = card.loginCredentials ? card.loginCredentials.password : 'Ration@104';
 
   const container = document.getElementById('members-form-container');
   container.innerHTML = '';
@@ -695,8 +678,6 @@ function handleSaveCard(e) {
   const phone = document.getElementById('input-phone').value.trim();
   const category = document.getElementById('input-category').value;
   const address = document.getElementById('input-address').value.trim();
-  const userId = document.getElementById('input-user-login-id').value.trim() || cardId;
-  const password = document.getElementById('input-user-password').value.trim() || 'Ration@104';
 
   const members = {};
   document.querySelectorAll('.member-row').forEach((row, idx) => {
@@ -722,8 +703,7 @@ function handleSaveCard(e) {
     membersCount: count, members, allocatedRiceKg: riceQ, allocatedRagiKg: ragiQ, allocatedQuotaKg: riceQ + ragiQ,
     status: existing.status || 'Eligible',
     distributedThisMonth: existing.distributedThisMonth || false,
-    lastDistributionDate: existing.lastDistributionDate || '',
-    loginCredentials: { userId, password }
+    lastDistributionDate: existing.lastDistributionDate || ''
   };
 
   if (window.db) window.db.ref(`cards/${cardId}`).set(cardData).then(() => showToast(`Card ${cardId} saved.`, 'success'));
@@ -1206,61 +1186,14 @@ function captureLiveRfid() {
   } else { showToast('Tap an RFID card on the ESP32 reader first.', 'info'); }
 }
 
-function renderBeneficiaryPortal(cardId) {
-  const card = currentCards[cardId];
-  if (!card) return;
-  const membersList = card.members ? Object.values(card.members) : [];
-  const riceQ = card.allocatedRiceKg ?? (membersList.length * 5);
-  const ragiQ = card.allocatedRagiKg ?? (membersList.length * 5);
-
-  document.getElementById('portal-consumer-name').innerText = card.headName;
-  document.getElementById('portal-card-category').innerText = `${card.category || 'BPL'} Card`;
-  document.getElementById('portal-card-id').innerText = card.cardId;
-  document.getElementById('portal-card-uid').innerText = card.rfidUid;
-  document.getElementById('portal-quota-rice').innerText = `${riceQ} kg`;
-  document.getElementById('portal-quota-ragi').innerText = `${ragiQ} kg`;
-  document.getElementById('portal-store-id').innerText = card.assignedStoreId || 'FPS_KA_BLR_042';
-
-  const statusBadge = document.getElementById('portal-status-badge');
-  statusBadge.className = card.distributedThisMonth
-    ? 'px-3.5 py-1.5 rounded text-xs font-bold bg-rose-100 text-rose-800'
-    : 'px-3.5 py-1.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800';
-  statusBadge.innerText = card.distributedThisMonth ? `DISTRIBUTED (${card.lastDistributionDate})` : 'ELIGIBLE FOR COLLECTION';
-
-  document.getElementById('portal-members-list').innerHTML = membersList.map(m => `
-    <div class="flex items-center gap-3 bg-white p-2.5 rounded-lg border border-slate-200">
-      <img src="${m.photoUrl || defaultAvatarUrl(m.name)}" class="w-11 h-11 rounded object-cover border border-slate-300">
-      <div class="flex-1 min-w-0">
-        <p class="font-bold text-xs text-slate-900 truncate">${m.name}</p>
-        <p class="text-[11px] text-slate-500">${m.relation} &bull; Age ${m.age || 30}</p>
-      </div>
-      <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-800 border border-slate-300">FP #${m.fpId}</span>
-    </div>
-  `).join('');
-
-  const myTxns = Object.values(currentTransactions).filter(t => t.cardId === cardId);
-  document.getElementById('portal-transactions-list').innerHTML = myTxns.length === 0
-    ? '<p class="text-xs text-slate-500">No past distributions recorded.</p>'
-    : myTxns.map(t => `
-      <div class="flex justify-between items-center bg-white p-3 rounded-lg border border-slate-200 text-xs">
-        <div>
-          <span class="font-bold text-slate-900">${t.riceQuantityKg ?? t.rationQuantityKg}kg Rice + ${t.ragiQuantityKg ?? 0}kg Ragi</span>
-          <span class="text-slate-500 text-[11px] block">Collected by ${t.consumerName} (${t.verificationMethod || 'BIOMETRIC'})</span>
-        </div>
-        <span class="font-mono text-slate-500">${t.distributionTimestamp}</span>
-      </div>
-    `).join('');
-}
-
 function switchPortal(portal) {
   const adminView = document.getElementById('admin-view');
   const opView = document.getElementById('operator-view');
-  const benView = document.getElementById('beneficiary-view');
   const telemetry = document.getElementById('shared-telemetry-panel');
   const btnAdmin = document.getElementById('btn-tab-admin');
   const btnOp = document.getElementById('btn-tab-operator');
 
-  [adminView, opView, benView].forEach(v => v.classList.add('hidden'));
+  [adminView, opView].forEach(v => v?.classList.add('hidden'));
   if (btnAdmin) btnAdmin.className = 'px-2.5 py-1 rounded text-slate-200 hover:text-white transition';
   if (btnOp) btnOp.className = 'px-2.5 py-1 rounded text-slate-200 hover:text-white transition';
 
@@ -1273,10 +1206,6 @@ function switchPortal(portal) {
     telemetry.classList.remove('hidden');
     if (btnOp) btnOp.className = 'px-2.5 py-1 rounded bg-white text-slate-900 transition';
     updateOperatorStoreBanner();
-  } else {
-    benView.classList.remove('hidden');
-    telemetry.classList.add('hidden');
-    renderBeneficiaryPortal(currentUser?.role === 'beneficiary' ? currentUser.id : 'RC101');
   }
 }
 
