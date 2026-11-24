@@ -15,14 +15,22 @@
       "location": "12.9784, 77.6408",
       "contactPhone": "+919876543201",
       "active": true
+    },
+    "FPS_KA_BLR_105": {
+      "storeId": "FPS_KA_BLR_105",
+      "name": "Fair Price Shop #105 (Jayanagar)",
+      "address": "Ward 22, 4th Block, Jayanagar, Bengaluru, Karnataka - 560011",
+      "location": "12.9250, 77.5938",
+      "contactPhone": "+919876543202",
+      "active": true
     }
   },
   "operators": {
     "OP_101": {
       "operatorId": "OP_101",
       "name": "Kiran Rao",
-      "email": "operator@fps42.gov",
-      "password": "Operator@2026",
+      "email": "operator1@pds.gov.in",
+      "password": "Operator@101",
       "storeId": "FPS_KA_BLR_042",
       "phone": "+919876543299",
       "active": true
@@ -30,10 +38,19 @@
     "OP_102": {
       "operatorId": "OP_102",
       "name": "Meena Devi",
-      "email": "operator@fps88.gov",
-      "password": "Operator@2026",
+      "email": "operator2@pds.gov.in",
+      "password": "Operator@102",
       "storeId": "FPS_KA_BLR_088",
       "phone": "+919876543298",
+      "active": true
+    },
+    "OP_103": {
+      "operatorId": "OP_103",
+      "name": "Arjun Nair",
+      "email": "operator3@pds.gov.in",
+      "password": "Operator@103",
+      "storeId": "FPS_KA_BLR_105",
+      "phone": "+919876543297",
       "active": true
     }
   },
@@ -59,7 +76,7 @@
       "rfidUid": "B37A4C12",
       "headName": "Ramesh Kumar",
       "phone": "+919876543210",
-      "address": "Ward 4, Block B, Main Street",
+      "address": "Ward 4, Block B, Main Street, Bengaluru",
       "assignedStoreId": "FPS_KA_BLR_042",
       "category": "BPL",
       "allocatedRiceKg": 10.0,
@@ -77,7 +94,7 @@
           "age": 46,
           "gender": "Male",
           "fpId": 1,
-          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=RameshKumar&backgroundColor=b6e3f4"
+          "photoUrl": ""
         },
         "M101_2": {
           "memberId": "M101_2",
@@ -86,13 +103,13 @@
           "age": 42,
           "gender": "Female",
           "fpId": 2,
-          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=SunitaKumar&backgroundColor=ffdfbf"
+          "photoUrl": ""
         }
       },
       "loginCredentials": {
         "userId": "RC101",
         "pin": "1001",
-        "password": "User@101"
+        "password": "Ration@101"
       }
     },
     "RC102": {
@@ -100,7 +117,7 @@
       "rfidUid": "D49F2188",
       "headName": "Rajesh Patel",
       "phone": "+919876543211",
-      "address": "Ward 7, Plot 14, Gandhi Nagar",
+      "address": "Ward 7, Plot 14, Gandhi Nagar, Bengaluru",
       "assignedStoreId": "FPS_KA_BLR_042",
       "category": "AAY",
       "allocatedRiceKg": 15.0,
@@ -118,7 +135,7 @@
           "age": 50,
           "gender": "Male",
           "fpId": 3,
-          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=RajeshPatel&backgroundColor=c0aede"
+          "photoUrl": ""
         },
         "M102_2": {
           "memberId": "M102_2",
@@ -127,7 +144,7 @@
           "age": 47,
           "gender": "Female",
           "fpId": 4,
-          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=PriyaPatel&backgroundColor=ffd5dc"
+          "photoUrl": ""
         },
         "M102_3": {
           "memberId": "M102_3",
@@ -136,13 +153,13 @@
           "age": 21,
           "gender": "Male",
           "fpId": 5,
-          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=AmitPatel&backgroundColor=d1d4f9"
+          "photoUrl": ""
         }
       },
       "loginCredentials": {
         "userId": "RC102",
         "pin": "1002",
-        "password": "User@102"
+        "password": "Ration@102"
       }
     },
     "RC103": {
@@ -150,7 +167,7 @@
       "rfidUid": "71A83B5E",
       "headName": "Suresh Sharma",
       "phone": "+919876543212",
-      "address": "Ward 12, House 89, Subhash Nagar",
+      "address": "Ward 12, House 89, Subhash Nagar, Bengaluru",
       "assignedStoreId": "FPS_KA_BLR_088",
       "category": "BPL",
       "allocatedRiceKg": 20.0,
@@ -168,7 +185,7 @@
           "age": 55,
           "gender": "Male",
           "fpId": 6,
-          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=SureshSharma&backgroundColor=b6e3f4"
+          "photoUrl": ""
         },
         "M103_2": {
           "memberId": "M103_2",
@@ -177,7 +194,7 @@
           "age": 51,
           "gender": "Female",
           "fpId": 7,
-          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=GeetaSharma&backgroundColor=ffdfbf"
+          "photoUrl": ""
         },
         "M103_3": {
           "memberId": "M103_3",
@@ -186,7 +203,7 @@
           "age": 26,
           "gender": "Male",
           "fpId": 8,
-          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=RahulSharma&backgroundColor=c0aede"
+          "photoUrl": ""
         },
         "M103_4": {
           "memberId": "M103_4",
@@ -195,13 +212,13 @@
           "age": 23,
           "gender": "Female",
           "fpId": 9,
-          "photoUrl": "https://api.dicebear.com/9.x/avataaars/svg?seed=AnitaSharma&backgroundColor=ffd5dc"
+          "photoUrl": ""
         }
       },
       "loginCredentials": {
         "userId": "RC103",
         "pin": "1003",
-        "password": "User@103"
+        "password": "Ration@103"
       }
     }
   },
@@ -234,7 +251,7 @@
   },
   "system_config": {
     "fpsShopId": "FPS_KA_BLR_042",
-    "shopName": "Government Fair Price Center #42",
+    "shopName": "Department of Food & Civil Supplies - PDS Portal",
     "currentCycle": "November 2026",
     "calibrationFactor": 420.5,
     "demoMode": true,
@@ -244,8 +261,8 @@
     "servoOpenAngle": 60,
     "dispenseFlowToleranceKg": 0.05,
     "adminCredentials": {
-      "username": "admin@smartration.gov",
-      "password": "Admin@Ration2026"
+      "username": "admin@pds.gov.in",
+      "password": "Admin@2026"
     }
   },
   "active_session": {
@@ -267,7 +284,7 @@
     "stage2Confirmed": false,
     "gateStatus": "CLOSED",
     "servoAngle": 0,
-    "message": "System Ready. Waiting for RFID Card or Store Operator Verification...",
-    "lastHeartbeat": "2026-11-25 00:15:00"
+    "message": "System Ready. Waiting for RFID Card or Store Operator Verification.",
+    "lastHeartbeat": "2026-11-25 01:05:00"
   }
 }

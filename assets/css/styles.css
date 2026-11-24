@@ -1,34 +1,37 @@
-/* Custom styles supplementing Tailwind CSS */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+/* Government PDS Portal Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --primary: #0284c7;
-  --primary-dark: #0369a1;
-  --secondary: #0f172a;
-  --accent-green: #10b981;
-  --accent-red: #ef4444;
-  --accent-amber: #f59e0b;
+  --gov-navy: #0f294a;
+  --gov-blue: #1e40af;
+  --gov-saffron: #d97706;
+  --gov-green: #047857;
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  background-color: #f8fafc;
-  color: #1e293b;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #f1f5f9;
+  color: #0f172a;
 }
 
 .font-mono {
   font-family: 'JetBrains Mono', monospace;
 }
 
-.glass-card {
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(226, 232, 240, 0.85);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+.gov-tricolor-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #ea580c 0%, #ea580c 33%, #ffffff 33%, #ffffff 66%, #15803d 66%, #15803d 100%);
 }
 
-.gradient-header {
-  background: linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #38bdf8 100%);
+.gov-header {
+  background-color: #0f294a;
+  color: #ffffff;
+}
+
+.glass-card {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
 }
 
 .pulse-indicator {
@@ -38,12 +41,12 @@ body {
 
 @keyframes pulse-ring {
   to {
-    box-shadow: 0 0 0 12px rgba(16, 185, 129, 0);
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
   }
 }
 
 .gate-indicator {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .gate-open {
@@ -64,21 +67,18 @@ body {
   background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+  border-radius: 3px;
 }
 
 .modal-enter {
-  animation: modalFadeIn 0.22s ease-out forwards;
+  animation: modalFadeIn 0.2s ease-out forwards;
 }
 
 @keyframes modalFadeIn {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(-10px);
+    transform: scale(0.97) translateY(-6px);
   }
   to {
     opacity: 1;

@@ -3,140 +3,194 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Public Ration Distribution System | Enterprise IoT Portal</title>
+  <title>Department of Food &amp; Civil Supplies | Smart Public Ration Distribution System</title>
 
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Firebase App, Auth & Realtime Database SDK (v8 compat for static GitHub Pages) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
+<body class="bg-slate-100 min-h-screen text-slate-900 flex flex-col">
 
-  <!-- Top Navigation Bar -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+  <!-- Official Top Tricolor Accent -->
+  <div class="gov-tricolor-bar w-full"></div>
+
+  <!-- Official Government Header -->
+  <header class="gov-header shadow-md sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-wrap justify-between items-center min-h-[64px] py-2 gap-3">
-        <!-- Logo and Brand -->
-        <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl gradient-header flex items-center justify-center text-white shadow-md">
-            <i data-lucide="scale" class="w-6 h-6"></i>
+      <div class="flex flex-wrap justify-between items-center min-h-[72px] py-2.5 gap-3">
+        <div class="flex items-center space-x-3.5">
+          <div class="w-11 h-11 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-amber-400">
+            <i data-lucide="landmark" class="w-6 h-6"></i>
           </div>
           <div>
-            <h1 class="font-bold text-base sm:text-lg leading-tight text-slate-900">Smart Public Ration Distribution System</h1>
-            <p class="text-xs text-slate-500 flex flex-wrap items-center gap-1.5 font-medium">
-              <span>ESP32 + RFID + R307 + HX711 + Mobile OTP</span>
-              <span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-              <span id="device-status-badge" class="inline-flex items-center gap-1 text-emerald-600">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-indicator"></span>
-                <span>ESP32 Ready</span>
-              </span>
-            </p>
+            <p class="text-[11px] uppercase tracking-widest text-slate-300 font-semibold">Department of Food, Civil Supplies &amp; Consumer Affairs</p>
+            <h1 class="font-bold text-base sm:text-lg leading-tight text-white">Smart Public Ration Distribution System (e-PDS)</h1>
           </div>
         </div>
 
-        <!-- Action Controls & Role Switcher -->
-        <div class="flex flex-wrap items-center gap-2">
-          <!-- Broadcast SMS Button (Admin action) -->
-          <button id="btn-broadcast-sms" onclick="openBroadcastModal()" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg text-white bg-amber-600 hover:bg-amber-700 transition shadow-sm">
-            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+        <!-- Authenticated Header Controls (Hidden until signed in) -->
+        <div id="header-auth-controls" class="hidden flex flex-wrap items-center gap-3">
+          <span id="device-status-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/10 border border-white/15 text-xs font-medium text-emerald-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-indicator"></span>
+            <span>IoT Node Online</span>
+          </span>
+
+          <!-- Admin-only Broadcast SMS & View Switcher -->
+          <button id="btn-broadcast-sms" onclick="openBroadcastModal()" class="hidden inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded bg-amber-600 hover:bg-amber-700 text-white transition">
+            <i data-lucide="megaphone" class="w-3.5 h-3.5"></i>
             <span>Broadcast SMS</span>
           </button>
 
-          <!-- Role / Portal Switcher -->
-          <div class="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-semibold">
-            <button id="btn-tab-admin" onclick="switchPortal('admin')" class="px-2.5 py-1.5 rounded-md bg-white text-slate-800 shadow-sm transition">Admin</button>
-            <button id="btn-tab-operator" onclick="switchPortal('operator')" class="px-2.5 py-1.5 rounded-md text-slate-600 hover:text-slate-900 transition">Store Operator</button>
-            <button id="btn-tab-beneficiary" onclick="switchPortal('beneficiary')" class="px-2.5 py-1.5 rounded-md text-slate-600 hover:text-slate-900 transition">Beneficiary</button>
+          <div id="admin-portal-switcher" class="hidden flex items-center bg-white/10 p-0.5 rounded border border-white/20 text-xs font-semibold">
+            <button id="btn-tab-admin" onclick="switchPortal('admin')" class="px-2.5 py-1 rounded bg-white text-slate-900 transition">Admin Console</button>
+            <button id="btn-tab-operator" onclick="switchPortal('operator')" class="px-2.5 py-1 rounded text-slate-200 hover:text-white transition">Counter Preview</button>
           </div>
 
-          <button id="btn-login-modal" onclick="openLoginModal()" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700">
-            <i data-lucide="user-circle" class="w-4 h-4"></i>
-            <span id="current-user-label">Admin (Signed In)</span>
-          </button>
+          <div class="flex items-center gap-2 pl-2 border-l border-white/20">
+            <div class="text-right hidden sm:block">
+              <p id="header-user-name" class="text-xs font-semibold text-white leading-none">--</p>
+              <p id="header-user-role" class="text-[10px] uppercase tracking-wider text-slate-300 mt-1">--</p>
+            </div>
+            <button onclick="logoutUser()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded bg-rose-700 hover:bg-rose-800 text-white border border-rose-500/40 transition">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+              <span>Sign Out</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Main Container -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <!-- ====================================================================== -->
+  <!-- VIEW 0: MANDATORY GOVERNMENT AUTHENTICATION GATE                       -->
+  <!-- ====================================================================== -->
+  <section id="auth-gate" class="flex-1 flex items-center justify-center px-4 py-10">
+    <div class="max-w-md w-full bg-white rounded-xl border border-slate-300 shadow-lg overflow-hidden">
+      <div class="bg-slate-900 text-white px-6 py-5 border-b border-slate-800">
+        <div class="flex items-center gap-2.5 text-amber-400 text-xs font-semibold uppercase tracking-wider mb-1">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+          <span>Authorized Personnel &amp; Citizen Access</span>
+        </div>
+        <h2 class="text-lg font-bold">Public Distribution Portal Sign In</h2>
+        <p class="text-xs text-slate-300 mt-0.5">Authenticate to access your assigned Administrative or Fair Price Shop portal.</p>
+      </div>
+
+      <form id="login-form" onsubmit="handleCredentialLogin(event)" class="p-6 space-y-4">
+        <!-- Role Guidance Tabs -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wide mb-1.5">Access Category</label>
+          <div class="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-semibold">
+            <button type="button" id="role-hint-admin" onclick="selectLoginHint('admin')" class="py-1.5 rounded bg-white text-slate-900 shadow-sm">Admin</button>
+            <button type="button" id="role-hint-operator" onclick="selectLoginHint('operator')" class="py-1.5 rounded text-slate-600 hover:text-slate-900">Store User</button>
+            <button type="button" id="role-hint-beneficiary" onclick="selectLoginHint('beneficiary')" class="py-1.5 rounded text-slate-600 hover:text-slate-900">Citizen</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1" id="login-id-label">Official Email / User ID</label>
+          <div class="relative">
+            <i data-lucide="user" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
+            <input type="text" id="login-identifier" required placeholder="admin@pds.gov.in" class="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-300 font-mono focus:outline-none focus:ring-2 focus:ring-blue-800">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Password</label>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
+            <input type="password" id="login-password" required placeholder="Enter password" class="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-300 font-mono focus:outline-none focus:ring-2 focus:ring-blue-800">
+          </div>
+        </div>
+
+        <div id="login-error-box" class="hidden p-2.5 rounded bg-rose-50 border border-rose-200 text-xs text-rose-800 font-medium"></div>
+
+        <button type="submit" class="w-full py-2.5 bg-[#0f294a] hover:bg-slate-800 text-white text-sm font-bold rounded-lg shadow transition flex items-center justify-center gap-2">
+          <i data-lucide="log-in" class="w-4 h-4"></i>
+          <span>Sign In to Portal</span>
+        </button>
+
+        <div class="pt-3 border-t border-slate-200 text-[11px] text-slate-500 flex items-center justify-between">
+          <span>Protected by Role-Based Access Control</span>
+          <span class="font-mono text-slate-400">e-PDS v2.4</span>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ====================================================================== -->
+  <!-- AUTHENTICATED APPLICATION SHELL (Hidden until signed in)               -->
+  <!-- ====================================================================== -->
+  <main id="app-shell" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
     <!-- SHARED LIVE HARDWARE TELEMETRY WIDGET (Shown on Admin & Operator views) -->
     <div id="shared-telemetry-panel" class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
-      <div class="lg:col-span-2 glass-card rounded-2xl p-5 border border-slate-200/80">
-        <div class="flex flex-wrap items-center justify-between border-b border-slate-100 pb-3 mb-4 gap-2">
+      <div class="lg:col-span-2 glass-card rounded-xl p-5">
+        <div class="flex flex-wrap items-center justify-between border-b border-slate-200 pb-3 mb-4 gap-2">
           <div class="flex items-center space-x-2">
-            <span class="p-1.5 rounded-lg bg-sky-100 text-sky-700">
+            <span class="p-1.5 rounded bg-slate-100 text-slate-800 border border-slate-200">
               <i data-lucide="cpu" class="w-4 h-4"></i>
             </span>
-            <h2 class="font-bold text-slate-800 text-sm tracking-wide uppercase">Live Hardware Telemetry (ESP32 Dispenser)</h2>
+            <h2 class="font-bold text-slate-800 text-xs tracking-wider uppercase">Live Hardware Telemetry (ESP32 Dispenser Unit)</h2>
           </div>
           <div class="flex items-center gap-2">
-            <span id="demo-mode-pill" class="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-100 text-indigo-800">DEMO SCALE 1:100</span>
-            <span id="telemetry-step" class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-700">IDLE</span>
+            <span id="demo-mode-pill" class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-800 border border-blue-200">DEMO SCALE 1:100</span>
+            <span id="telemetry-step" class="px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">IDLE</span>
           </div>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-          <!-- RFID Status -->
-          <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
-            <span class="text-[11px] text-slate-400 font-semibold block uppercase">Active Card</span>
-            <span id="telemetry-card" class="text-sm font-bold text-slate-800 font-mono mt-1 block">WAITING...</span>
+          <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
+            <span class="text-[11px] text-slate-500 font-semibold block uppercase">Active Card</span>
+            <span id="telemetry-card" class="text-sm font-bold text-slate-900 font-mono mt-1 block">WAITING</span>
             <span id="telemetry-consumer" class="text-[11px] text-slate-500 truncate block mt-0.5">No card tapped</span>
           </div>
 
-          <!-- Auth Verification -->
-          <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
-            <span class="text-[11px] text-slate-400 font-semibold block uppercase">Verification</span>
+          <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
+            <span class="text-[11px] text-slate-500 font-semibold block uppercase">Verification</span>
             <div class="flex items-center justify-center gap-1 mt-1">
               <i data-lucide="shield-check" id="telemetry-fp-icon" class="w-4 h-4 text-slate-400"></i>
-              <span id="telemetry-fp" class="text-sm font-bold text-slate-800 font-mono">--</span>
+              <span id="telemetry-fp" class="text-sm font-bold text-slate-900 font-mono">--</span>
             </div>
             <span id="telemetry-fp-status" class="text-[11px] text-slate-500 block mt-0.5">Fingerprint / OTP</span>
           </div>
 
-          <!-- Active Commodity Stage -->
-          <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
-            <span class="text-[11px] text-slate-400 font-semibold block uppercase">Commodity Stage</span>
-            <span id="telemetry-commodity" class="text-sm font-bold text-amber-700 font-mono mt-1 block">--</span>
-            <span id="telemetry-commodity-sub" class="text-[11px] text-slate-500 block mt-0.5">Rice (5kg/p) + Ragi (5kg/p)</span>
+          <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
+            <span class="text-[11px] text-slate-500 font-semibold block uppercase">Commodity Stage</span>
+            <span id="telemetry-commodity" class="text-sm font-bold text-amber-800 font-mono mt-1 block">--</span>
+            <span id="telemetry-commodity-sub" class="text-[11px] text-slate-500 block mt-0.5">Rice + Ragi Sequence</span>
           </div>
 
-          <!-- Servo Gate Status -->
-          <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
-            <span class="text-[11px] text-slate-400 font-semibold block uppercase">Funnel Shutter</span>
+          <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
+            <span class="text-[11px] text-slate-500 font-semibold block uppercase">Funnel Valve</span>
             <div class="flex items-center justify-center gap-1.5 mt-1">
-              <span id="servo-gate-icon" class="inline-block transform gate-indicator gate-closed font-bold text-slate-500">
+              <span id="servo-gate-icon" class="inline-block transform gate-indicator gate-closed font-bold text-slate-600">
                 <i data-lucide="shield" class="w-4 h-4"></i>
               </span>
-              <span id="telemetry-gate" class="text-sm font-bold text-slate-800 font-mono">0° (CLOSED)</span>
+              <span id="telemetry-gate" class="text-sm font-bold text-slate-900 font-mono">0 deg (CLOSED)</span>
             </div>
             <span id="telemetry-gate-detail" class="text-[11px] text-slate-500 block mt-0.5">Valve sealed</span>
           </div>
         </div>
 
-        <!-- Real-Time HX711 Load Cell Weight Meter -->
-        <div class="mt-4 bg-gradient-to-r from-sky-50 to-blue-50 border border-sky-100 rounded-xl p-4">
-          <div class="flex flex-wrap items-center justify-between text-xs font-semibold text-slate-600 mb-1.5 gap-2">
-            <span>HX711 DISPENSED: <span id="weight-current" class="font-mono text-sky-700 text-sm font-bold">0.00 kg</span> <span id="weight-physical-grams" class="text-[11px] text-slate-500 font-mono">(0 g physical)</span></span>
-            <span>STAGE TARGET: <span id="weight-target" class="font-mono text-slate-800 text-sm font-bold">0.00 kg</span></span>
+        <div class="mt-4 bg-slate-50 border border-slate-200 rounded-lg p-4">
+          <div class="flex flex-wrap items-center justify-between text-xs font-semibold text-slate-700 mb-1.5 gap-2">
+            <span>HX711 DISPENSED: <span id="weight-current" class="font-mono text-blue-900 text-sm font-bold">0.00 kg</span> <span id="weight-physical-grams" class="text-[11px] text-slate-500 font-mono">(0 g physical)</span></span>
+            <span>STAGE TARGET: <span id="weight-target" class="font-mono text-slate-900 text-sm font-bold">0.00 kg</span></span>
           </div>
-          <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden shadow-inner">
-            <div id="weight-progress-bar" class="bg-sky-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+          <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+            <div id="weight-progress-bar" class="bg-blue-800 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
           </div>
-          <div class="flex flex-wrap justify-between items-center text-xs text-slate-500 mt-2 font-mono gap-2">
-            <span id="status-live-message" class="text-slate-700">ESP32 Ready: Waiting for RFID Card or Operator Verification...</span>
+          <div class="flex flex-wrap justify-between items-center text-xs text-slate-600 mt-2 font-mono gap-2">
+            <span id="status-live-message">ESP32 Ready: Waiting for RFID Card or Operator Verification.</span>
             <div class="flex items-center gap-2">
-              <button id="btn-confirm-stage2" onclick="confirmStage2Ragi()" class="hidden px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow animate-pulse">
-                Confirm Ragi Bag Placed &amp; Start Stage 2 &rarr;
+              <button id="btn-confirm-stage2" onclick="confirmStage2Ragi()" class="hidden px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded shadow">
+                Confirm Ragi Vessel Placed &amp; Start Stage 2
               </button>
-              <span id="dispense-percentage" class="font-bold text-sky-800">0%</span>
+              <span id="dispense-percentage" class="font-bold text-slate-900">0%</span>
             </div>
           </div>
         </div>
@@ -144,36 +198,36 @@
 
       <!-- Summary KPI Cards -->
       <div class="space-y-3">
-        <div class="glass-card rounded-2xl p-4 border border-slate-200/80 flex items-center justify-between">
+        <div class="glass-card rounded-xl p-4 flex items-center justify-between">
           <div>
-            <p class="text-xs font-semibold uppercase text-slate-400">Ration Cards &amp; Members</p>
+            <p class="text-xs font-semibold uppercase text-slate-500">Registered Ration Cards</p>
             <h3 id="stat-total-cards" class="text-2xl font-bold text-slate-900 mt-0.5">3</h3>
-            <p class="text-xs text-slate-500 mt-0.5"><span id="stat-total-members" class="font-semibold text-sky-600">9</span> Enrolled Citizens</p>
+            <p class="text-xs text-slate-500 mt-0.5"><span id="stat-total-members" class="font-semibold text-blue-900">9</span> Enrolled Beneficiaries</p>
           </div>
-          <div class="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
-            <i data-lucide="credit-card" class="w-6 h-6"></i>
-          </div>
-        </div>
-
-        <div class="glass-card rounded-2xl p-4 border border-slate-200/80 flex items-center justify-between">
-          <div>
-            <p class="text-xs font-semibold uppercase text-slate-400">Active Quota Rate</p>
-            <h3 id="stat-quota-rate" class="text-lg font-bold text-emerald-700 mt-0.5">5kg Rice + 5kg Ragi</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Per family member / month</p>
-          </div>
-          <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-            <i data-lucide="wheat" class="w-6 h-6"></i>
+          <div class="w-11 h-11 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center border border-slate-200">
+            <i data-lucide="credit-card" class="w-5 h-5"></i>
           </div>
         </div>
 
-        <div class="glass-card rounded-2xl p-4 border border-slate-200/80 flex items-center justify-between">
+        <div class="glass-card rounded-xl p-4 flex items-center justify-between">
           <div>
-            <p class="text-xs font-semibold uppercase text-slate-400">Distributed This Month</p>
-            <h3 id="stat-distributed-count" class="text-2xl font-bold text-amber-600 mt-0.5">0 / 3</h3>
-            <p class="text-xs text-slate-500 mt-0.5"><span id="stat-total-stores" class="font-semibold text-slate-700">2</span> Fair Price Stores Active</p>
+            <p class="text-xs font-semibold uppercase text-slate-500">Monthly Quota Rate</p>
+            <h3 id="stat-quota-rate" class="text-lg font-bold text-emerald-800 mt-0.5">5kg Rice + 5kg Ragi</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Allocated per household member</p>
           </div>
-          <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-            <i data-lucide="store" class="w-6 h-6"></i>
+          <div class="w-11 h-11 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200">
+            <i data-lucide="package-check" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-xl p-4 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase text-slate-500">Cycle Distributions</p>
+            <h3 id="stat-distributed-count" class="text-2xl font-bold text-amber-700 mt-0.5">0 / 3</h3>
+            <p class="text-xs text-slate-500 mt-0.5"><span id="stat-total-stores" class="font-semibold text-slate-800">3</span> Fair Price Stores Active</p>
+          </div>
+          <div class="w-11 h-11 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200">
+            <i data-lucide="store" class="w-5 h-5"></i>
           </div>
         </div>
       </div>
@@ -182,31 +236,30 @@
     <!-- ====================================================================== -->
     <!-- VIEW 1: SUPER ADMIN CONSOLE                                            -->
     <!-- ====================================================================== -->
-    <div id="admin-view" class="space-y-6">
-      <!-- Navigation Tabs for Admin Sections -->
-      <div class="border-b border-slate-200 overflow-x-auto">
+    <div id="admin-view" class="hidden space-y-6">
+      <div class="border-b border-slate-300 overflow-x-auto">
         <nav class="flex space-x-6 min-w-max">
-          <button onclick="switchAdminTab('beneficiaries')" id="tab-btn-beneficiaries" class="border-b-2 border-sky-600 py-3 px-1 text-sm font-semibold text-sky-600 flex items-center gap-1.5">
+          <button onclick="switchAdminTab('beneficiaries')" id="tab-btn-beneficiaries" class="border-b-2 border-blue-900 py-3 px-1 text-sm font-semibold text-blue-900 flex items-center gap-1.5">
             <i data-lucide="users" class="w-4 h-4"></i>
             <span>Ration Cards &amp; Members</span>
           </button>
-          <button onclick="switchAdminTab('stores')" id="tab-btn-stores" class="border-b-2 border-transparent py-3 px-1 text-sm font-medium text-slate-500 hover:text-slate-700 flex items-center gap-1.5">
+          <button onclick="switchAdminTab('stores')" id="tab-btn-stores" class="border-b-2 border-transparent py-3 px-1 text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
             <i data-lucide="map-pin" class="w-4 h-4"></i>
             <span>Stores &amp; Operators</span>
           </button>
-          <button onclick="switchAdminTab('commodities')" id="tab-btn-commodities" class="border-b-2 border-transparent py-3 px-1 text-sm font-medium text-slate-500 hover:text-slate-700 flex items-center gap-1.5">
+          <button onclick="switchAdminTab('commodities')" id="tab-btn-commodities" class="border-b-2 border-transparent py-3 px-1 text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
             <i data-lucide="package" class="w-4 h-4"></i>
             <span>Groceries &amp; Quotas</span>
           </button>
-          <button onclick="switchAdminTab('transactions')" id="tab-btn-transactions" class="border-b-2 border-transparent py-3 px-1 text-sm font-medium text-slate-500 hover:text-slate-700 flex items-center gap-1.5">
-            <i data-lucide="history" class="w-4 h-4"></i>
+          <button onclick="switchAdminTab('transactions')" id="tab-btn-transactions" class="border-b-2 border-transparent py-3 px-1 text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
             <span>Distribution Logs</span>
           </button>
-          <button onclick="switchAdminTab('sms')" id="tab-btn-sms" class="border-b-2 border-transparent py-3 px-1 text-sm font-medium text-slate-500 hover:text-slate-700 flex items-center gap-1.5">
+          <button onclick="switchAdminTab('sms')" id="tab-btn-sms" class="border-b-2 border-transparent py-3 px-1 text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
             <i data-lucide="message-square" class="w-4 h-4"></i>
-            <span>SMS &amp; OTP Logs</span>
+            <span>SMS &amp; OTP Center</span>
           </button>
-          <button onclick="switchAdminTab('settings')" id="tab-btn-settings" class="border-b-2 border-transparent py-3 px-1 text-sm font-medium text-slate-500 hover:text-slate-700 flex items-center gap-1.5">
+          <button onclick="switchAdminTab('settings')" id="tab-btn-settings" class="border-b-2 border-transparent py-3 px-1 text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
             <i data-lucide="sliders" class="w-4 h-4"></i>
             <span>Weights &amp; Calibration</span>
           </button>
@@ -217,112 +270,102 @@
       <section id="section-beneficiaries" class="space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div class="relative w-full sm:w-80">
-            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
-            <input type="text" id="search-cards" onkeyup="filterCards()" placeholder="Search card ID, head name, RFID UID..." class="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
+            <input type="text" id="search-cards" onkeyup="filterCards()" placeholder="Search Card ID, Head Name, RFID UID..." class="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-800">
           </div>
           <div class="flex items-center gap-2 w-full sm:w-auto">
-            <button onclick="resetAllMonthlyStatus()" class="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 shadow-sm transition flex items-center gap-1.5">
+            <button onclick="resetAllMonthlyStatus()" class="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition flex items-center gap-1.5">
               <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
               <span>Reset Month Quotas</span>
             </button>
-            <button onclick="openAddCardModal()" class="px-4 py-2 text-xs font-semibold text-white bg-sky-600 rounded-lg hover:bg-sky-700 shadow-sm transition flex items-center gap-1.5">
+            <button onclick="openAddCardModal()" class="px-4 py-2 text-xs font-semibold text-white bg-[#0f294a] rounded-lg hover:bg-slate-800 transition flex items-center gap-1.5">
               <i data-lucide="user-plus" class="w-4 h-4"></i>
-              <span>+ Add New Ration Card</span>
+              <span>Add New Ration Card</span>
             </button>
           </div>
         </div>
 
-        <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          <!-- Dynamically populated cards -->
-        </div>
+        <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
       </section>
 
       <!-- SECTION 2: STORES & DISTRIBUTION OPERATORS -->
       <section id="section-stores" class="hidden space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Fair Price Shop Stores -->
-          <div class="glass-card rounded-2xl p-5 border border-slate-200 space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+          <div class="glass-card rounded-xl p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
               <div>
                 <h3 class="font-bold text-slate-900 text-sm">Fair Price Shop Stores (Locations)</h3>
-                <p class="text-xs text-slate-500">Manage ration distribution centers &amp; GPS locations</p>
+                <p class="text-xs text-slate-500">Manage official ration distribution centers and coordinates</p>
               </div>
-              <button onclick="openStoreModal()" class="px-3 py-1.5 text-xs font-semibold text-white bg-sky-600 rounded-lg hover:bg-sky-700 flex items-center gap-1">
+              <button onclick="openStoreModal()" class="px-3 py-1.5 text-xs font-semibold text-white bg-[#0f294a] rounded-lg hover:bg-slate-800 flex items-center gap-1">
                 <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                 <span>Add Store</span>
               </button>
             </div>
-            <div id="stores-list-container" class="space-y-3">
-              <!-- Store items -->
-            </div>
+            <div id="stores-list-container" class="space-y-3"></div>
           </div>
 
-          <!-- Store Distribution Operators -->
-          <div class="glass-card rounded-2xl p-5 border border-slate-200 space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+          <div class="glass-card rounded-xl p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
               <div>
-                <h3 class="font-bold text-slate-900 text-sm">Distribution Operators (Store Staff)</h3>
-                <p class="text-xs text-slate-500">Assign users to manage ration distribution at specific stores</p>
+                <h3 class="font-bold text-slate-900 text-sm">Distribution Operators (Store Users)</h3>
+                <p class="text-xs text-slate-500">Provision staff accounts linked to store locations</p>
               </div>
-              <button onclick="openOperatorModal()" class="px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 flex items-center gap-1">
+              <button onclick="openOperatorModal()" class="px-3 py-1.5 text-xs font-semibold text-white bg-emerald-700 rounded-lg hover:bg-emerald-800 flex items-center gap-1">
                 <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
                 <span>Add Operator</span>
               </button>
             </div>
-            <div id="operators-list-container" class="space-y-3">
-              <!-- Operator items -->
-            </div>
+            <div id="operators-list-container" class="space-y-3"></div>
           </div>
         </div>
       </section>
 
       <!-- SECTION 3: GROCERY COMMODITIES & QUOTA MANAGEMENT -->
       <section id="section-commodities" class="hidden space-y-5">
-        <div class="glass-card rounded-2xl p-6 border border-slate-200 max-w-3xl">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="glass-card rounded-xl p-6 max-w-3xl">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
             <div>
               <h3 class="font-bold text-slate-900 text-base">Per-Person Grocery Entitlement Rules</h3>
-              <p class="text-xs text-slate-500">Configure exact kg allocated per family member. Changes recalculate card quotas automatically.</p>
+              <p class="text-xs text-slate-500">Configure monthly allocation per citizen. Saving recalculates all cards.</p>
             </div>
-            <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Active Policy</span>
+            <span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-100 text-emerald-800">ACTIVE POLICY</span>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Rice Card -->
-            <div class="p-4 rounded-xl bg-sky-50 border border-sky-200 space-y-3">
+            <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-3">
               <div class="flex justify-between items-center">
-                <span class="font-bold text-sky-900 text-sm">1. Rice (Sona Masoori)</span>
-                <span class="text-xs font-mono bg-white px-2 py-0.5 rounded border border-sky-200 text-sky-700">Commodity #1</span>
+                <span class="font-bold text-slate-900 text-sm">1. Rice (PDS Grade A)</span>
+                <span class="text-[11px] font-mono bg-white px-2 py-0.5 rounded border border-slate-300 text-slate-700">STAGE 1</span>
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1">Allocation per Person (kg)</label>
-                <input type="number" step="0.5" min="0" id="comm-rice-kg" value="5" class="w-full p-2 text-sm font-bold rounded-lg border border-slate-300">
+                <input type="number" step="0.5" min="0" id="comm-rice-kg" value="5" class="w-full p-2 text-sm font-bold rounded border border-slate-300 bg-white">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1">Current Store Stock (kg)</label>
-                <input type="number" step="1" min="0" id="comm-rice-stock" value="500" class="w-full p-2 text-xs rounded-lg border border-slate-300 font-mono">
+                <input type="number" step="1" min="0" id="comm-rice-stock" value="500" class="w-full p-2 text-xs rounded border border-slate-300 font-mono bg-white">
               </div>
             </div>
 
-            <!-- Ragi Card -->
-            <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 space-y-3">
+            <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-3">
               <div class="flex justify-between items-center">
-                <span class="font-bold text-amber-900 text-sm">2. Ragi (Finger Millet)</span>
-                <span class="text-xs font-mono bg-white px-2 py-0.5 rounded border border-amber-200 text-amber-700">Commodity #2</span>
+                <span class="font-bold text-slate-900 text-sm">2. Ragi (Finger Millet)</span>
+                <span class="text-[11px] font-mono bg-white px-2 py-0.5 rounded border border-slate-300 text-slate-700">STAGE 2</span>
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1">Allocation per Person (kg)</label>
-                <input type="number" step="0.5" min="0" id="comm-ragi-kg" value="5" class="w-full p-2 text-sm font-bold rounded-lg border border-slate-300">
+                <input type="number" step="0.5" min="0" id="comm-ragi-kg" value="5" class="w-full p-2 text-sm font-bold rounded border border-slate-300 bg-white">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1">Current Store Stock (kg)</label>
-                <input type="number" step="1" min="0" id="comm-ragi-stock" value="500" class="w-full p-2 text-xs rounded-lg border border-slate-300 font-mono">
+                <input type="number" step="1" min="0" id="comm-ragi-stock" value="500" class="w-full p-2 text-xs rounded border border-slate-300 font-mono bg-white">
               </div>
             </div>
           </div>
 
           <div class="mt-5 flex justify-end">
-            <button onclick="saveCommoditySettings()" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg shadow flex items-center gap-2">
+            <button onclick="saveCommoditySettings()" class="px-5 py-2.5 bg-[#0f294a] hover:bg-slate-800 text-white text-xs font-bold rounded-lg shadow flex items-center gap-2">
               <i data-lucide="save" class="w-4 h-4"></i>
               <span>Save &amp; Recalculate All Ration Cards</span>
             </button>
@@ -340,24 +383,22 @@
           </button>
         </div>
 
-        <div class="glass-card rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+        <div class="glass-card rounded-xl overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-              <thead class="bg-slate-100 text-slate-600 uppercase font-semibold border-b border-slate-200">
+              <thead class="bg-slate-100 text-slate-700 uppercase font-semibold border-b border-slate-200">
                 <tr>
                   <th class="p-3">Txn ID</th>
                   <th class="p-3">Card &amp; Store</th>
-                  <th class="p-3">Consumer</th>
+                  <th class="p-3">Beneficiary</th>
                   <th class="p-3">Verification</th>
                   <th class="p-3">Rice / Ragi (kg)</th>
-                  <th class="p-3">Date &amp; Time</th>
+                  <th class="p-3">Timestamp</th>
                   <th class="p-3">Status</th>
                   <th class="p-3 text-right">Receipt</th>
                 </tr>
               </thead>
-              <tbody id="transactions-tbody" class="divide-y divide-slate-100">
-                <!-- Transactions rows -->
-              </tbody>
+              <tbody id="transactions-tbody" class="divide-y divide-slate-200"></tbody>
             </table>
           </div>
         </div>
@@ -366,17 +407,17 @@
       <!-- SECTION 5: SMS & OTP NOTIFICATION CENTER -->
       <section id="section-sms" class="hidden space-y-5">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div class="glass-card rounded-2xl p-5 border border-slate-200 col-span-1 space-y-3">
-            <div class="flex items-center gap-2 text-amber-600">
-              <i data-lucide="bell-ring" class="w-5 h-5"></i>
+          <div class="glass-card rounded-xl p-5 col-span-1 space-y-3">
+            <div class="flex items-center gap-2 text-amber-700">
+              <i data-lucide="megaphone" class="w-5 h-5"></i>
               <h3 class="font-bold text-slate-900">Broadcast SMS Notice</h3>
             </div>
             <p class="text-xs text-slate-600 leading-relaxed">
-              Notify all registered households when the Fair Price Shop opens for monthly Rice &amp; Ragi distribution.
+              Notify all registered households when monthly Rice and Ragi distribution commences.
             </p>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Broadcast Message</label>
-              <textarea id="broadcast-msg-text" rows="4" class="w-full p-2.5 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 font-mono">Fair Price Shop #42 NOTICE: Monthly Rice (5kg/person) &amp; Ragi (5kg/person) distribution has commenced. Bring your RFID Smart Card.</textarea>
+              <textarea id="broadcast-msg-text" rows="4" class="w-full p-2.5 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-800 font-mono">Department of Food &amp; Civil Supplies NOTICE: Monthly Rice (5kg/person) &amp; Ragi (5kg/person) distribution has commenced. Please visit your assigned Fair Price Shop with your RFID Smart Card.</textarea>
             </div>
             <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs flex justify-between">
               <span class="text-slate-500">Registered Recipients:</span>
@@ -388,53 +429,48 @@
             </button>
           </div>
 
-          <div class="glass-card rounded-2xl p-5 border border-slate-200 col-span-2 space-y-3">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-              <h3 class="font-bold text-slate-900 text-sm">Real-Time SMS &amp; OTP Delivery Audit Log</h3>
-              <span class="text-xs text-emerald-600 font-semibold">Hybrid SMS Gateway Active</span>
+          <div class="glass-card rounded-xl p-5 col-span-2 space-y-3">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+              <h3 class="font-bold text-slate-900 text-sm">Real-Time SMS &amp; OTP Audit Log</h3>
+              <span class="text-xs text-emerald-700 font-semibold">Hybrid SMS Gateway Active</span>
             </div>
-            <div id="sms-logs-container" class="space-y-2 max-h-80 overflow-y-auto pr-1">
-              <!-- Logs populated dynamically -->
-            </div>
+            <div id="sms-logs-container" class="space-y-2 max-h-80 overflow-y-auto pr-1"></div>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 6: WEIGHTS, DEMO MODE & HARDWARE CALIBRATION -->
+      <!-- SECTION 6: WEIGHTS, DEMO MODE & CALIBRATION -->
       <section id="section-settings" class="hidden space-y-5">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <!-- Load Cell Demo & Quick Calibration Card -->
-          <div class="glass-card rounded-2xl p-5 border border-slate-200 space-y-4">
+          <div class="glass-card rounded-xl p-5 space-y-4">
             <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
-              <i data-lucide="scale" class="w-4 h-4 text-sky-600"></i>
-              <span>Load Cell Weight Modes &amp; Demo Calibration</span>
+              <i data-lucide="scale" class="w-4 h-4 text-blue-900"></i>
+              <span>Load Cell Weight Modes &amp; Calibration</span>
             </h3>
 
-            <!-- Demo Scale Ratio Mode -->
-            <div class="p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 space-y-2.5">
+            <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200 space-y-2.5">
               <div class="flex items-center justify-between">
                 <div>
-                  <span class="font-bold text-xs text-indigo-900 block">Demo Scale Ratio Mode (Fast Project Demo)</span>
-                  <span class="text-[11px] text-indigo-700">Scale down physical grain weight for tabletop demos</span>
+                  <span class="font-bold text-xs text-slate-900 block">Demo Scale Ratio Mode</span>
+                  <span class="text-[11px] text-slate-600">Scales down physical grain weight for tabletop verification</span>
                 </div>
-                <input type="checkbox" id="setting-demo-mode" checked class="w-4 h-4 accent-indigo-600">
+                <input type="checkbox" id="setting-demo-mode" checked class="w-4 h-4 accent-blue-900">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-indigo-900 mb-1">Scale Ratio</label>
-                <select id="setting-demo-ratio" class="w-full p-2 text-xs rounded-lg border border-indigo-300 bg-white font-semibold">
-                  <option value="100">1:100 Ratio (10.0 kg quota = 100 grams on load cell)</option>
-                  <option value="50">1:50 Ratio (10.0 kg quota = 200 grams on load cell)</option>
-                  <option value="10">1:10 Ratio (10.0 kg quota = 1.0 kg on load cell)</option>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Scale Ratio</label>
+                <select id="setting-demo-ratio" class="w-full p-2 text-xs rounded-lg border border-slate-300 bg-white font-semibold">
+                  <option value="100">1:100 Ratio (10.0 kg quota = 100 grams physical)</option>
+                  <option value="50">1:50 Ratio (10.0 kg quota = 200 grams physical)</option>
+                  <option value="10">1:10 Ratio (10.0 kg quota = 1.0 kg physical)</option>
                   <option value="1">1:1 Full Scale (10.0 kg quota = 10.0 kg real grain)</option>
                 </select>
               </div>
             </div>
 
-            <!-- 5-Second Bottle Auto-Calibrate -->
-            <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 space-y-2">
+            <div class="p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 space-y-2">
               <span class="font-bold text-xs text-emerald-900 block">5-Second Water Bottle Auto-Calibrate</span>
-              <p class="text-[11px] text-emerald-700">Place a standard <strong>500ml water bottle (0.50 kg)</strong> on the load cell, then click the button below to auto-calibrate your HX711.</p>
-              <button onclick="triggerQuickCalibrate500g()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow">
+              <p class="text-[11px] text-emerald-800">Place a standard <strong>500ml water bottle (0.50 kg)</strong> on the load cell platform, then click below to calibrate HX711.</p>
+              <button onclick="triggerQuickCalibrate500g()" class="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg shadow">
                 Trigger 500g Bottle Auto-Calibrate on ESP32
               </button>
             </div>
@@ -454,30 +490,26 @@
               </div>
             </div>
 
-            <button onclick="saveHardwareSettings()" class="w-full py-2.5 bg-slate-900 text-white text-xs font-bold rounded-lg hover:bg-slate-800">
-              Sync All Weight &amp; Hardware Settings to ESP32
+            <button onclick="saveHardwareSettings()" class="w-full py-2.5 bg-[#0f294a] text-white text-xs font-bold rounded-lg hover:bg-slate-800">
+              Sync Weight &amp; Hardware Settings to ESP32
             </button>
           </div>
 
-          <!-- Firebase & Gateway Credentials -->
-          <div class="glass-card rounded-2xl p-5 border border-slate-200 space-y-4">
+          <div class="glass-card rounded-xl p-5 space-y-4">
             <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
-              <i data-lucide="cloud" class="w-4 h-4 text-emerald-600"></i>
+              <i data-lucide="database" class="w-4 h-4 text-emerald-700"></i>
               <span>Cloud Backend &amp; Hybrid OTP Gateway</span>
             </h3>
-
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Firebase Realtime Database URL</label>
               <input type="text" readonly value="https://beneficiary-details-default-rtdb.asia-southeast1.firebasedatabase.app/" class="w-full p-2 text-xs rounded-lg border border-slate-200 bg-slate-100 font-mono text-slate-600">
             </div>
-
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Twilio Account SID / Fast2SMS Key (Optional)</label>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Twilio / Fast2SMS API Key (Optional)</label>
               <input type="text" id="setting-sms-key" placeholder="Leave blank for Hybrid On-Screen OTP Simulation" class="w-full p-2 text-xs rounded-lg border border-slate-300 font-mono">
             </div>
-
-            <div class="bg-amber-50 p-3.5 rounded-lg border border-amber-200 text-xs text-amber-800 leading-relaxed space-y-1">
-              <p><strong>Hybrid OTP Mode Active:</strong> When the Store Operator clicks <em>"Send Mobile OTP"</em>, a cryptographic 6-digit OTP is generated, logged to the SMS Delivery Center, and displayed in an operator alert card so you can immediately demonstrate OTP verification without external SMS charges.</p>
+            <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-xs text-slate-700 leading-relaxed">
+              <strong>Hybrid OTP Policy:</strong> Clicking <em>Send Mobile OTP</em> generates a 6-digit verification code, appends an audit record to the SMS Center, and displays the verification preview for operator testing.
             </div>
           </div>
         </div>
@@ -488,147 +520,133 @@
     <!-- VIEW 2: STORE DISTRIBUTION OPERATOR COUNTER                            -->
     <!-- ====================================================================== -->
     <div id="operator-view" class="hidden space-y-6">
-      <!-- Assigned Store Header Banner -->
-      <div class="glass-card rounded-2xl p-5 border-l-4 border-sky-600 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div class="glass-card rounded-xl p-5 border-l-4 border-[#0f294a] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div class="flex items-start gap-3">
-          <div class="w-12 h-12 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+          <div class="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 text-slate-800 flex items-center justify-center shrink-0">
             <i data-lucide="store" class="w-6 h-6"></i>
           </div>
           <div>
             <div class="flex flex-wrap items-center gap-2">
               <h2 id="op-store-name" class="text-lg font-bold text-slate-900">Fair Price Shop #42 (Gandhi Nagar)</h2>
-              <span id="op-store-id" class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-mono text-xs font-bold">FPS_KA_BLR_042</span>
+              <span id="op-store-id" class="px-2 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-800 font-mono text-xs font-bold">FPS_KA_BLR_042</span>
             </div>
             <p id="op-store-address" class="text-xs text-slate-600 mt-0.5">Ward 4, 3rd Cross, Gandhi Nagar, Bengaluru, Karnataka - 560009</p>
             <p class="text-[11px] text-slate-500 mt-1 font-mono">
-              Operator: <strong id="op-user-name" class="text-slate-800">Kiran Rao</strong> &bull;
-              GPS Location: <span id="op-store-gps">12.9716, 77.5946</span>
+              Operator: <strong id="op-user-name" class="text-slate-900">Kiran Rao</strong> |
+              GPS Coordinates: <span id="op-store-gps">12.9716, 77.5946</span>
             </p>
           </div>
         </div>
 
-        <!-- Card Search Box -->
         <div class="w-full md:w-96 flex gap-2">
           <div class="relative flex-1">
             <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
-            <input type="text" id="op-card-search" placeholder="Enter Ration Card No (e.g. RC101) or UID" class="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-300 font-mono uppercase focus:ring-2 focus:ring-sky-500">
+            <input type="text" id="op-card-search" placeholder="Enter Ration Card No (e.g. RC101) or UID" class="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-300 font-mono uppercase focus:ring-2 focus:ring-blue-800">
           </div>
-          <button onclick="operatorLookupCard()" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-lg shadow">
-            Lookup
+          <button onclick="operatorLookupCard()" class="px-4 py-2 bg-[#0f294a] hover:bg-slate-800 text-white text-xs font-bold rounded-lg shadow">
+            Search Card
           </button>
         </div>
       </div>
 
-      <!-- Quick Card Selector Pills for Testing -->
       <div class="flex flex-wrap items-center gap-2 text-xs">
-        <span class="text-slate-500 font-semibold">Quick Load Card:</span>
-        <button onclick="operatorLoadCard('RC101')" class="px-2.5 py-1 bg-white border border-slate-300 rounded-md hover:border-sky-500 font-mono font-semibold">RC101 (2 Members)</button>
-        <button onclick="operatorLoadCard('RC102')" class="px-2.5 py-1 bg-white border border-slate-300 rounded-md hover:border-sky-500 font-mono font-semibold">RC102 (3 Members)</button>
-        <button onclick="operatorLoadCard('RC103')" class="px-2.5 py-1 bg-white border border-slate-300 rounded-md hover:border-sky-500 font-mono font-semibold">RC103 (4 Members)</button>
+        <span class="text-slate-600 font-semibold">Registered Cards Quick Lookup:</span>
+        <button onclick="operatorLoadCard('RC101')" class="px-2.5 py-1 bg-white border border-slate-300 rounded hover:border-blue-800 font-mono font-semibold">RC101 (2 Members)</button>
+        <button onclick="operatorLoadCard('RC102')" class="px-2.5 py-1 bg-white border border-slate-300 rounded hover:border-blue-800 font-mono font-semibold">RC102 (3 Members)</button>
+        <button onclick="operatorLoadCard('RC103')" class="px-2.5 py-1 bg-white border border-slate-300 rounded hover:border-blue-800 font-mono font-semibold">RC103 (4 Members)</button>
       </div>
 
-      <!-- Operator Active Card Workspace -->
       <div id="op-card-workspace" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Left 2 Columns: Family Members & Photos + Entitlement -->
-        <div class="lg:col-span-2 glass-card rounded-2xl p-6 border border-slate-200 space-y-5">
-          <div class="flex flex-wrap justify-between items-start gap-3 border-b border-slate-100 pb-4">
+        <div class="lg:col-span-2 glass-card rounded-xl p-6 space-y-5">
+          <div class="flex flex-wrap justify-between items-start gap-3 border-b border-slate-200 pb-4">
             <div>
               <div class="flex items-center gap-2">
                 <h3 id="op-card-head" class="text-xl font-bold text-slate-900">Ramesh Kumar</h3>
-                <span id="op-card-cat" class="px-2 py-0.5 rounded text-xs font-bold bg-amber-100 text-amber-800">BPL</span>
+                <span id="op-card-cat" class="px-2 py-0.5 rounded text-xs font-bold bg-slate-100 border border-slate-300 text-slate-800">BPL</span>
               </div>
-              <p class="text-xs text-slate-500 font-mono mt-1">
-                Card ID: <strong id="op-card-id" class="text-slate-800">RC101</strong> |
-                RFID UID: <strong id="op-card-uid" class="text-slate-800">B37A4C12</strong> |
-                Mobile: <strong id="op-card-phone" class="text-slate-800">+919876543210</strong>
+              <p class="text-xs text-slate-600 font-mono mt-1">
+                Card ID: <strong id="op-card-id" class="text-slate-900">RC101</strong> |
+                RFID UID: <strong id="op-card-uid" class="text-slate-900">B37A4C12</strong> |
+                Mobile: <strong id="op-card-phone" class="text-slate-900">+919876543210</strong>
               </p>
             </div>
-            <span id="op-card-status-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-              Eligible For Collection
+            <span id="op-card-status-badge" class="px-3 py-1 rounded text-xs font-bold bg-emerald-100 text-emerald-800">
+              ELIGIBLE
             </span>
           </div>
 
-          <!-- Dual Commodity Entitlement Banner -->
           <div class="grid grid-cols-2 gap-4">
-            <div class="bg-sky-50 border border-sky-200 rounded-xl p-4 flex items-center justify-between">
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 flex items-center justify-between">
               <div>
-                <span class="text-xs font-bold uppercase text-sky-700">Stage 1: Rice Quota</span>
-                <h4 id="op-quota-rice" class="text-2xl font-extrabold text-sky-900 mt-0.5">10.0 kg</h4>
-                <span class="text-[11px] text-sky-700" id="op-quota-rice-calc">2 members &times; 5 kg/person</span>
+                <span class="text-xs font-bold uppercase text-slate-600">Stage 1: Rice Quota</span>
+                <h4 id="op-quota-rice" class="text-2xl font-extrabold text-slate-900 mt-0.5">10.0 kg</h4>
+                <span class="text-[11px] text-slate-500" id="op-quota-rice-calc">2 members x 5 kg/person</span>
               </div>
-              <i data-lucide="package-check" class="w-8 h-8 text-sky-600"></i>
+              <i data-lucide="package-check" class="w-7 h-7 text-blue-900"></i>
             </div>
 
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between">
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 flex items-center justify-between">
               <div>
-                <span class="text-xs font-bold uppercase text-amber-700">Stage 2: Ragi Quota</span>
-                <h4 id="op-quota-ragi" class="text-2xl font-extrabold text-amber-900 mt-0.5">10.0 kg</h4>
-                <span class="text-[11px] text-amber-700" id="op-quota-ragi-calc">2 members &times; 5 kg/person</span>
+                <span class="text-xs font-bold uppercase text-slate-600">Stage 2: Ragi Quota</span>
+                <h4 id="op-quota-ragi" class="text-2xl font-extrabold text-slate-900 mt-0.5">10.0 kg</h4>
+                <span class="text-[11px] text-slate-500" id="op-quota-ragi-calc">2 members x 5 kg/person</span>
               </div>
-              <i data-lucide="wheat" class="w-8 h-8 text-amber-600"></i>
+              <i data-lucide="layers" class="w-7 h-7 text-amber-700"></i>
             </div>
           </div>
 
-          <!-- Family Members Photo Gallery -->
           <div>
-            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Registered Household Members (Verify Face &amp; Biometric ID)</h4>
-            <div id="op-members-gallery" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <!-- Populated dynamically with photos -->
-            </div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Registered Household Members &amp; Identity Photos</h4>
+            <div id="op-members-gallery" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
           </div>
         </div>
 
-        <!-- Right Column: Verification & Dispense Controller -->
-        <div class="glass-card rounded-2xl p-6 border border-slate-200 space-y-5 flex flex-col justify-between">
+        <div class="glass-card rounded-xl p-6 space-y-5 flex flex-col justify-between">
           <div class="space-y-4">
-            <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wide border-b border-slate-100 pb-2">Step 2: Verify Beneficiary</h3>
+            <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wide border-b border-slate-200 pb-2">Beneficiary Verification</h3>
 
-            <!-- Method Switcher -->
-            <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl">
-              <button id="btn-auth-fp" onclick="switchVerificationMode('fingerprint')" class="py-2 text-xs font-bold rounded-lg bg-white text-slate-900 shadow-sm">
+            <div class="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-lg border border-slate-200">
+              <button id="btn-auth-fp" onclick="switchVerificationMode('fingerprint')" class="py-2 text-xs font-bold rounded bg-white text-slate-900 shadow-sm">
                 Fingerprint (R307)
               </button>
-              <button id="btn-auth-otp" onclick="switchVerificationMode('otp')" class="py-2 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900">
+              <button id="btn-auth-otp" onclick="switchVerificationMode('otp')" class="py-2 text-xs font-bold rounded text-slate-600 hover:text-slate-900">
                 Mobile OTP
               </button>
             </div>
 
-            <!-- Mode A: Biometric Verification -->
-            <div id="panel-verify-fp" class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <div id="panel-verify-fp" class="space-y-3 bg-slate-50 p-4 rounded-lg border border-slate-200">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center shrink-0">
+                <div class="w-10 h-10 rounded-lg bg-white border border-slate-300 text-blue-900 flex items-center justify-center shrink-0">
                   <i data-lucide="fingerprint" class="w-6 h-6"></i>
                 </div>
                 <div>
-                  <p class="font-bold text-xs text-slate-800">R307 Optical Scanner Ready</p>
-                  <p class="text-[11px] text-slate-500">Ask any listed family member to place their finger on the sensor.</p>
+                  <p class="font-bold text-xs text-slate-900">R307 Optical Scanner Ready</p>
+                  <p class="text-[11px] text-slate-600">Place any registered family member finger on the sensor.</p>
                 </div>
               </div>
-              <button onclick="simulateHardwareDispense(activeOperatorCardId, 'BIOMETRIC')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-lg shadow flex items-center justify-center gap-1.5">
+              <button onclick="simulateHardwareDispense(activeOperatorCardId, 'BIOMETRIC')" class="w-full py-2.5 bg-[#0f294a] hover:bg-slate-800 text-white text-xs font-bold rounded-lg shadow flex items-center justify-center gap-1.5">
                 <i data-lucide="play" class="w-4 h-4"></i>
                 <span>Simulate Biometric Match &amp; Dispense</span>
               </button>
             </div>
 
-            <!-- Mode B: Mobile OTP Verification -->
-            <div id="panel-verify-otp" class="hidden space-y-3 bg-amber-50/70 p-4 rounded-xl border border-amber-200">
+            <div id="panel-verify-otp" class="hidden space-y-3 bg-slate-50 p-4 rounded-lg border border-slate-200">
               <p class="text-xs text-slate-700 leading-relaxed">
-                Send a 6-digit verification OTP to the beneficiary's registered mobile: <strong id="otp-target-phone" class="font-mono">+919876543210</strong>.
+                Send a 6-digit verification OTP to registered mobile: <strong id="otp-target-phone" class="font-mono">+919876543210</strong>.
               </p>
               <button onclick="sendBeneficiaryOtp()" class="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow">
                 Send 6-Digit Mobile OTP
               </button>
 
-              <!-- Hybrid Simulated On-Screen OTP Box -->
-              <div id="otp-sim-banner" class="hidden p-2.5 bg-white border border-amber-300 rounded-lg text-center">
-                <span class="text-[10px] font-bold uppercase text-amber-700 block">SMS Gateway (Live Simulation Preview)</span>
+              <div id="otp-sim-banner" class="hidden p-2.5 bg-white border border-amber-300 rounded text-center">
+                <span class="text-[10px] font-bold uppercase text-amber-800 block">SMS Gateway (Demo Preview)</span>
                 <span class="text-sm font-mono font-extrabold text-slate-900 tracking-widest" id="otp-sim-code">482910</span>
               </div>
 
               <div class="space-y-2 pt-1">
                 <label class="block text-xs font-semibold text-slate-700">Enter 6-Digit OTP</label>
-                <input type="text" id="input-otp-code" maxlength="6" placeholder="e.g. 482910" class="w-full p-2.5 text-center text-sm font-mono font-bold tracking-widest rounded-lg border border-slate-300">
-                <button onclick="verifyOtpAndDispense()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow flex items-center justify-center gap-1.5">
+                <input type="text" id="input-otp-code" maxlength="6" placeholder="e.g. 482910" class="w-full p-2.5 text-center text-sm font-mono font-bold tracking-widest rounded-lg border border-slate-300 bg-white">
+                <button onclick="verifyOtpAndDispense()" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg shadow flex items-center justify-center gap-1.5">
                   <i data-lucide="check-circle" class="w-4 h-4"></i>
                   <span>Verify OTP &amp; Start Dispensing</span>
                 </button>
@@ -636,83 +654,82 @@
             </div>
           </div>
 
-          <div class="pt-4 border-t border-slate-100 text-[11px] text-slate-500">
-            <p><strong>Sequential Flow:</strong> Upon authorization, Stage 1 dispenses Rice, waits for vessel swap confirmation, then Stage 2 dispenses Ragi.</p>
+          <div class="pt-4 border-t border-slate-200 text-[11px] text-slate-500">
+            <p><strong>Dispensing Protocol:</strong> Stage 1 dispenses Rice, pauses for vessel swap confirmation, then Stage 2 dispenses Ragi.</p>
           </div>
         </div>
       </div>
 
-      <!-- Empty State when no card searched -->
-      <div id="op-empty-state" class="glass-card rounded-2xl p-10 text-center border border-slate-200 text-slate-400">
-        <i data-lucide="credit-card" class="w-12 h-12 mx-auto mb-3 text-slate-300"></i>
-        <p class="text-sm font-semibold text-slate-600">Enter a Ration Card Number above or Tap an RFID Card on the ESP32</p>
-        <p class="text-xs mt-1">Family member photos, Rice &amp; Ragi quotas, and Biometric/OTP verification will load automatically.</p>
+      <div id="op-empty-state" class="glass-card rounded-xl p-10 text-center text-slate-500">
+        <i data-lucide="credit-card" class="w-10 h-10 mx-auto mb-3 text-slate-400"></i>
+        <p class="text-sm font-semibold text-slate-700">Enter a Ration Card Number above or Tap an RFID Card on the ESP32</p>
+        <p class="text-xs mt-1">Registered family photos, Rice &amp; Ragi quotas, and Biometric/OTP verification will load automatically.</p>
       </div>
     </div>
 
     <!-- ====================================================================== -->
-    <!-- VIEW 3: BENEFICIARY PORTAL VIEW                                        -->
+    <!-- VIEW 3: BENEFICIARY CITIZEN PORTAL                                     -->
     <!-- ====================================================================== -->
     <div id="beneficiary-view" class="hidden space-y-6">
-      <div class="glass-card rounded-2xl p-6 border border-slate-200">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-5">
+      <div class="glass-card rounded-xl p-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-5">
           <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-xl">
-              <i data-lucide="user-check" class="w-8 h-8"></i>
+            <div class="w-14 h-14 rounded-lg bg-slate-100 border border-slate-300 text-slate-800 flex items-center justify-center font-bold text-xl">
+              <i data-lucide="user-check" class="w-7 h-7"></i>
             </div>
             <div>
               <div class="flex items-center gap-2">
                 <h2 id="portal-consumer-name" class="text-xl font-bold text-slate-900">Ramesh Kumar</h2>
-                <span id="portal-card-category" class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">BPL Card</span>
+                <span id="portal-card-category" class="px-2 py-0.5 rounded text-xs font-bold bg-slate-100 border border-slate-300 text-slate-800">BPL Card</span>
               </div>
-              <p class="text-xs text-slate-500 font-mono mt-0.5">Card ID: <span id="portal-card-id" class="font-bold text-slate-800">RC101</span> | RFID UID: <span id="portal-card-uid" class="font-bold text-slate-800">B37A4C12</span></p>
+              <p class="text-xs text-slate-600 font-mono mt-0.5">Card ID: <span id="portal-card-id" class="font-bold text-slate-900">RC101</span> | RFID UID: <span id="portal-card-uid" class="font-bold text-slate-900">B37A4C12</span></p>
             </div>
           </div>
 
-          <div id="portal-status-badge" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1.5">
-            <i data-lucide="check-circle" class="w-4 h-4"></i>
-            <span>Eligible For Collection</span>
+          <div id="portal-status-badge" class="px-3.5 py-1.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800">
+            ELIGIBLE FOR COLLECTION
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-5">
-          <div class="bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-100 rounded-xl p-4 space-y-2">
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-2">
             <span class="text-xs font-semibold text-slate-500 uppercase">Monthly Entitlement</span>
             <div>
               <p class="text-xs text-slate-600">Rice (5 kg/person):</p>
-              <h3 id="portal-quota-rice" class="text-xl font-extrabold text-sky-800">10.0 kg</h3>
+              <h3 id="portal-quota-rice" class="text-xl font-extrabold text-slate-900">10.0 kg</h3>
             </div>
             <div>
               <p class="text-xs text-slate-600">Ragi (5 kg/person):</p>
-              <h3 id="portal-quota-ragi" class="text-xl font-extrabold text-amber-700">10.0 kg</h3>
+              <h3 id="portal-quota-ragi" class="text-xl font-extrabold text-slate-900">10.0 kg</h3>
             </div>
-            <div class="pt-2 border-t border-sky-200/60 text-xs text-slate-500 flex justify-between">
+            <div class="pt-2 border-t border-slate-200 text-xs text-slate-500 flex justify-between">
               <span>Assigned Store:</span>
-              <span id="portal-store-id" class="font-semibold text-slate-700 font-mono">FPS_KA_BLR_042</span>
+              <span id="portal-store-id" class="font-semibold text-slate-800 font-mono">FPS_KA_BLR_042</span>
             </div>
           </div>
 
-          <div class="md:col-span-2 bg-slate-50 border border-slate-200/80 rounded-xl p-4">
-            <h4 class="text-xs font-bold uppercase text-slate-500 mb-3">Registered Household Members &amp; Photos</h4>
-            <div id="portal-members-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <!-- Rendered dynamically -->
-            </div>
+          <div class="md:col-span-2 bg-slate-50 border border-slate-200 rounded-lg p-4">
+            <h4 class="text-xs font-bold uppercase text-slate-500 mb-3">Registered Household Members &amp; Biometric IDs</h4>
+            <div id="portal-members-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
           </div>
         </div>
 
-        <div class="mt-6 pt-5 border-t border-slate-100">
+        <div class="mt-6 pt-5 border-t border-slate-200">
           <h4 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2">
-            <i data-lucide="receipt" class="w-4 h-4 text-sky-600"></i>
-            <span>My Ration Collection Receipts</span>
+            <i data-lucide="file-text" class="w-4 h-4 text-slate-700"></i>
+            <span>Collection Receipts</span>
           </h4>
-          <div id="portal-transactions-list" class="space-y-2">
-            <!-- Rendered dynamically -->
-          </div>
+          <div id="portal-transactions-list" class="space-y-2"></div>
         </div>
       </div>
     </div>
 
   </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-3 px-4 text-center text-[11px] text-slate-500">
+    Department of Food, Civil Supplies &amp; Consumer Affairs &bull; Smart Public Ration Distribution System (e-PDS)
+  </footer>
 
   <!-- ====================================================================== -->
   <!-- MODALS                                                                 -->
@@ -720,12 +737,10 @@
 
   <!-- MODAL: ADD / EDIT RATION CARD -->
   <div id="modal-card" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl modal-enter max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
-        <h3 id="modal-card-title" class="font-bold text-lg text-slate-900">Add New Beneficiary Ration Card</h3>
-        <button onclick="closeModal('modal-card')" class="text-slate-400 hover:text-slate-600">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
+    <div class="bg-white rounded-xl max-w-3xl w-full p-6 shadow-2xl modal-enter max-h-[90vh] overflow-y-auto border border-slate-300">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3 mb-4">
+        <h3 id="modal-card-title" class="font-bold text-lg text-slate-900">Add New Ration Card</h3>
+        <button onclick="closeModal('modal-card')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
 
       <form id="form-ration-card" onsubmit="handleSaveCard(event)" class="space-y-4">
@@ -734,35 +749,33 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Ration Card ID *</label>
-            <input type="text" id="input-card-id" required placeholder="e.g. RC104" class="w-full p-2 text-xs rounded-lg border border-slate-300 font-mono uppercase">
+            <input type="text" id="input-card-id" required placeholder="e.g. RC104" class="w-full p-2 text-xs rounded border border-slate-300 font-mono uppercase">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">RFID Card UID *</label>
             <div class="flex gap-1">
-              <input type="text" id="input-rfid-uid" required placeholder="e.g. A3B8C1D4" class="w-full p-2 text-xs rounded-lg border border-slate-300 font-mono uppercase">
-              <button type="button" onclick="captureLiveRfid()" title="Capture from ESP32" class="px-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-xs font-semibold">Tap</button>
+              <input type="text" id="input-rfid-uid" required placeholder="e.g. A3B8C1D4" class="w-full p-2 text-xs rounded border border-slate-300 font-mono uppercase">
+              <button type="button" onclick="captureLiveRfid()" title="Capture from ESP32" class="px-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-xs font-semibold">Tap</button>
             </div>
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Assigned Store *</label>
-            <select id="input-assigned-store" class="w-full p-2 text-xs rounded-lg border border-slate-300 font-mono">
-              <!-- Populated from stores -->
-            </select>
+            <select id="input-assigned-store" class="w-full p-2 text-xs rounded border border-slate-300 font-mono"></select>
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Family Head Name *</label>
-            <input type="text" id="input-head-name" required placeholder="e.g. Anand Murthy" class="w-full p-2 text-xs rounded-lg border border-slate-300">
+            <input type="text" id="input-head-name" required placeholder="Full Name" class="w-full p-2 text-xs rounded border border-slate-300">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Mobile Number (SMS/OTP) *</label>
-            <input type="tel" id="input-phone" required placeholder="+919876543219" class="w-full p-2 text-xs rounded-lg border border-slate-300 font-mono">
+            <input type="tel" id="input-phone" required placeholder="+919876543219" class="w-full p-2 text-xs rounded border border-slate-300 font-mono">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Card Category</label>
-            <select id="input-category" class="w-full p-2 text-xs rounded-lg border border-slate-300">
+            <select id="input-category" class="w-full p-2 text-xs rounded border border-slate-300">
               <option value="BPL">BPL</option>
               <option value="AAY">AAY</option>
               <option value="APL">APL</option>
@@ -772,40 +785,36 @@
 
         <div>
           <label class="block text-xs font-semibold text-slate-700 mb-1">Residential Address</label>
-          <input type="text" id="input-address" placeholder="Ward / House No / Village" class="w-full p-2 text-xs rounded-lg border border-slate-300">
+          <input type="text" id="input-address" placeholder="Ward / House No / Street" class="w-full p-2 text-xs rounded border border-slate-300">
         </div>
 
-        <!-- Household Members Sub-Form (With Photo Capture / Upload + FP ID) -->
         <div class="border-t border-slate-200 pt-3">
           <div class="flex justify-between items-center mb-2">
             <div>
-              <label class="block text-xs font-bold text-slate-800">Family Members, Photos &amp; Fingerprint Slot IDs</label>
-              <p class="text-[11px] text-slate-500">Quotas calculate automatically at 5 kg Rice + 5 kg Ragi per member added.</p>
+              <label class="block text-xs font-bold text-slate-800">Family Members, Identity Photos &amp; Fingerprint Slots</label>
+              <p class="text-[11px] text-slate-500">Quotas calculate automatically at 5 kg Rice + 5 kg Ragi per member.</p>
             </div>
-            <button type="button" onclick="addMemberRow()" class="px-2.5 py-1 text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200 rounded hover:bg-sky-100">
-              + Add Member
+            <button type="button" onclick="addMemberRow()" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-300 rounded hover:bg-slate-200">
+              Add Member
             </button>
           </div>
-
-          <div id="members-form-container" class="space-y-2 max-h-60 overflow-y-auto pr-1">
-            <!-- Dynamic member rows -->
-          </div>
+          <div id="members-form-container" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
         </div>
 
-        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 grid grid-cols-2 gap-3">
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Beneficiary Login ID</label>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Citizen Login ID</label>
             <input type="text" id="input-user-login-id" placeholder="RC104" class="w-full p-2 text-xs rounded border border-slate-300 bg-white font-mono">
           </div>
           <div>
-            <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Beneficiary Password</label>
-            <input type="text" id="input-user-password" value="User@104" class="w-full p-2 text-xs rounded border border-slate-300 bg-white font-mono">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Citizen Portal Password</label>
+            <input type="text" id="input-user-password" value="Ration@104" class="w-full p-2 text-xs rounded border border-slate-300 bg-white font-mono">
           </div>
         </div>
 
-        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
           <button type="button" onclick="closeModal('modal-card')" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
-          <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 rounded-lg shadow">Save Ration Card</button>
+          <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-[#0f294a] hover:bg-slate-800 rounded-lg shadow">Save Ration Card</button>
         </div>
       </form>
     </div>
@@ -813,20 +822,18 @@
 
   <!-- MODAL: WEBCAM PHOTO CAPTURE -->
   <div id="modal-camera" class="fixed inset-0 z-50 hidden bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl modal-enter space-y-4">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+    <div class="bg-white rounded-xl max-w-md w-full p-5 shadow-2xl modal-enter space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-2">
         <h3 class="font-bold text-slate-900 text-sm">Capture Citizen Photo</h3>
-        <button onclick="closeCameraModal()" class="text-slate-400 hover:text-slate-600">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
+        <button onclick="closeCameraModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <div class="bg-slate-900 rounded-xl overflow-hidden aspect-video flex items-center justify-center">
+      <div class="bg-slate-900 rounded-lg overflow-hidden aspect-video flex items-center justify-center">
         <video id="camera-video" autoplay playsinline class="w-full h-full object-cover"></video>
         <canvas id="camera-canvas" class="hidden"></canvas>
       </div>
       <div class="flex justify-end gap-2">
         <button onclick="closeCameraModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
-        <button onclick="captureCameraSnapshot()" class="px-5 py-2 text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 rounded-lg shadow flex items-center gap-1.5">
+        <button onclick="captureCameraSnapshot()" class="px-5 py-2 text-xs font-bold text-white bg-[#0f294a] hover:bg-slate-800 rounded-lg shadow flex items-center gap-1.5">
           <i data-lucide="camera" class="w-4 h-4"></i>
           <span>Capture &amp; Use Photo</span>
         </button>
@@ -836,37 +843,37 @@
 
   <!-- MODAL: ADD STORE -->
   <div id="modal-store" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl modal-enter">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
-        <h3 class="font-bold text-slate-900">Add / Edit Fair Price Store</h3>
+    <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl modal-enter">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3 mb-4">
+        <h3 class="font-bold text-slate-900">Add Fair Price Shop Store</h3>
         <button onclick="closeModal('modal-store')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <form onsubmit="handleSaveStore(event)" class="space-y-3">
         <div>
           <label class="block text-xs font-semibold text-slate-700 mb-1">Store ID *</label>
-          <input type="text" id="input-store-id" required placeholder="FPS_KA_BLR_099" class="w-full p-2 text-xs rounded-lg border border-slate-300 font-mono uppercase">
+          <input type="text" id="input-store-id" required placeholder="FPS_KA_BLR_110" class="w-full p-2 text-xs rounded border border-slate-300 font-mono uppercase">
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-700 mb-1">Store Name *</label>
-          <input type="text" id="input-store-name" required placeholder="Fair Price Shop #99" class="w-full p-2 text-xs rounded-lg border border-slate-300">
+          <input type="text" id="input-store-name" required placeholder="Fair Price Shop #110" class="w-full p-2 text-xs rounded border border-slate-300">
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-700 mb-1">Full Address *</label>
-          <input type="text" id="input-store-address" required placeholder="Street, Ward, City, PIN" class="w-full p-2 text-xs rounded-lg border border-slate-300">
+          <input type="text" id="input-store-address" required placeholder="Street, Ward, City, PIN" class="w-full p-2 text-xs rounded border border-slate-300">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">GPS Location</label>
-            <input type="text" id="input-store-location" value="12.9716, 77.5946" class="w-full p-2 text-xs rounded-lg border border-slate-300 font-mono">
+            <input type="text" id="input-store-location" value="12.9716, 77.5946" class="w-full p-2 text-xs rounded border border-slate-300 font-mono">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Store Phone</label>
-            <input type="tel" id="input-store-phone" placeholder="+919876543200" class="w-full p-2 text-xs rounded-lg border border-slate-300 font-mono">
+            <input type="tel" id="input-store-phone" placeholder="+919876543200" class="w-full p-2 text-xs rounded border border-slate-300 font-mono">
           </div>
         </div>
-        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
           <button type="button" onclick="closeModal('modal-store')" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
-          <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 rounded-lg shadow">Save Store</button>
+          <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-[#0f294a] hover:bg-slate-800 rounded-lg shadow">Save Store</button>
         </div>
       </form>
     </div>
@@ -874,39 +881,37 @@
 
   <!-- MODAL: ADD OPERATOR -->
   <div id="modal-operator" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl modal-enter">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
-        <h3 class="font-bold text-slate-900">Add Distribution Operator</h3>
+    <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl modal-enter">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3 mb-4">
+        <h3 class="font-bold text-slate-900">Add Store Distribution Operator</h3>
         <button onclick="closeModal('modal-operator')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <form onsubmit="handleSaveOperator(event)" class="space-y-3">
         <div>
           <label class="block text-xs font-semibold text-slate-700 mb-1">Operator Full Name *</label>
-          <input type="text" id="input-op-name" required placeholder="e.g. Kiran Rao" class="w-full p-2 text-xs rounded-lg border border-slate-300">
+          <input type="text" id="input-op-name" required placeholder="Full Name" class="w-full p-2 text-xs rounded border border-slate-300">
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-700 mb-1">Assign to Store Location *</label>
-          <select id="input-op-store" required class="w-full p-2 text-xs rounded-lg border border-slate-300 font-mono">
-            <!-- Populated dynamically -->
-          </select>
+          <select id="input-op-store" required class="w-full p-2 text-xs rounded border border-slate-300 font-mono"></select>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Login Email *</label>
-            <input type="email" id="input-op-email" required placeholder="operator@fps.gov" class="w-full p-2 text-xs rounded-lg border border-slate-300 font-mono">
+            <input type="email" id="input-op-email" required placeholder="operator4@pds.gov.in" class="w-full p-2 text-xs rounded border border-slate-300 font-mono">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Password *</label>
-            <input type="text" id="input-op-password" required value="Operator@2026" class="w-full p-2 text-xs rounded-lg border border-slate-300 font-mono">
+            <input type="text" id="input-op-password" required value="Operator@104" class="w-full p-2 text-xs rounded border border-slate-300 font-mono">
           </div>
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-700 mb-1">Contact Phone</label>
-          <input type="tel" id="input-op-phone" placeholder="+919876543299" class="w-full p-2 text-xs rounded-lg border border-slate-300 font-mono">
+          <input type="tel" id="input-op-phone" placeholder="+919876543296" class="w-full p-2 text-xs rounded border border-slate-300 font-mono">
         </div>
-        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
           <button type="button" onclick="closeModal('modal-operator')" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
-          <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow">Create Operator</button>
+          <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg shadow">Create Operator</button>
         </div>
       </form>
     </div>
@@ -914,19 +919,19 @@
 
   <!-- MODAL: BROADCAST SMS CONFIRMATION -->
   <div id="modal-broadcast" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl modal-enter">
-      <div class="flex items-center gap-3 text-amber-600 mb-3">
-        <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
-          <i data-lucide="bell" class="w-6 h-6"></i>
+    <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl modal-enter">
+      <div class="flex items-center gap-3 text-amber-700 mb-3">
+        <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+          <i data-lucide="megaphone" class="w-5 h-5"></i>
         </div>
         <div>
           <h3 class="font-bold text-slate-900">Broadcast SMS Confirmation</h3>
-          <p class="text-xs text-slate-500">Public distribution alert</p>
+          <p class="text-xs text-slate-500">Official public distribution alert</p>
         </div>
       </div>
 
       <p class="text-xs text-slate-600 mb-4 leading-relaxed">
-        Are you sure you want to broadcast this SMS notification to <span id="confirm-recipient-count" class="font-bold text-slate-900">3</span> registered beneficiary households?
+        Confirm sending this SMS alert to <span id="confirm-recipient-count" class="font-bold text-slate-900">3</span> registered households?
       </p>
 
       <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs font-mono text-slate-700 mb-4" id="confirm-broadcast-preview"></div>
@@ -935,80 +940,14 @@
         <button onclick="closeModal('modal-broadcast')" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
         <button onclick="executeBroadcastSMS()" class="px-4 py-2 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-lg shadow flex items-center gap-1.5">
           <i data-lucide="check" class="w-4 h-4"></i>
-          <span>Confirm &amp; Send Now</span>
+          <span>Confirm &amp; Dispatch</span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: ROLE LOGIN / ACCOUNT SWITCHER -->
-  <div id="modal-login" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl modal-enter max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-2">
-        <h3 class="font-bold text-slate-900">Sign In / Role Switcher</h3>
-        <button onclick="closeModal('modal-login')" class="text-slate-400 hover:text-slate-600">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <!-- Credential Login Form -->
-      <form onsubmit="handleCredentialLogin(event)" class="space-y-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200 mb-4">
-        <p class="text-[11px] font-bold uppercase text-slate-500">Sign in with Email / Card ID &amp; Password</p>
-        <input type="text" id="login-identifier" placeholder="Email or Ration Card ID (e.g. operator@fps42.gov)" required class="w-full p-2 text-xs rounded-lg border border-slate-300 bg-white font-mono">
-        <input type="password" id="login-password" placeholder="Password" required class="w-full p-2 text-xs rounded-lg border border-slate-300 bg-white font-mono">
-        <button type="submit" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg">Sign In</button>
-      </form>
-
-      <div class="space-y-2">
-        <p class="text-[11px] font-bold uppercase text-slate-400">1-Click Quick Role Switch (Demo):</p>
-
-        <button onclick="loginAsQuick('admin')" class="w-full text-left p-2.5 rounded-xl border border-slate-200 hover:border-sky-500 hover:bg-sky-50 transition flex items-center justify-between">
-          <div>
-            <p class="font-bold text-xs text-slate-800">Super Admin</p>
-            <p class="text-[11px] text-slate-500 font-mono">admin@smartration.gov</p>
-          </div>
-          <span class="text-xs font-bold text-sky-600">Enter &rarr;</span>
-        </button>
-
-        <button onclick="loginAsQuick('OP_101')" class="w-full text-left p-2.5 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition flex items-center justify-between">
-          <div>
-            <p class="font-bold text-xs text-slate-800">Store Operator: Kiran Rao (Shop #42)</p>
-            <p class="text-[11px] text-slate-500 font-mono">operator@fps42.gov | Pwd: Operator@2026</p>
-          </div>
-          <span class="text-xs font-bold text-emerald-600">Enter &rarr;</span>
-        </button>
-
-        <button onclick="loginAsQuick('RC101')" class="w-full text-left p-2.5 rounded-xl border border-slate-200 hover:border-sky-500 hover:bg-sky-50 transition flex items-center justify-between">
-          <div>
-            <p class="font-bold text-xs text-slate-800">Beneficiary Card 1: Ramesh Kumar (2 Members)</p>
-            <p class="text-[11px] text-slate-500 font-mono">ID: RC101 | Pwd: User@101</p>
-          </div>
-          <span class="text-xs font-bold text-sky-600">Enter &rarr;</span>
-        </button>
-
-        <button onclick="loginAsQuick('RC102')" class="w-full text-left p-2.5 rounded-xl border border-slate-200 hover:border-sky-500 hover:bg-sky-50 transition flex items-center justify-between">
-          <div>
-            <p class="font-bold text-xs text-slate-800">Beneficiary Card 2: Rajesh Patel (3 Members)</p>
-            <p class="text-[11px] text-slate-500 font-mono">ID: RC102 | Pwd: User@102</p>
-          </div>
-          <span class="text-xs font-bold text-sky-600">Enter &rarr;</span>
-        </button>
-
-        <button onclick="loginAsQuick('RC103')" class="w-full text-left p-2.5 rounded-xl border border-slate-200 hover:border-sky-500 hover:bg-sky-50 transition flex items-center justify-between">
-          <div>
-            <p class="font-bold text-xs text-slate-800">Beneficiary Card 3: Suresh Sharma (4 Members)</p>
-            <p class="text-[11px] text-slate-500 font-mono">ID: RC103 | Pwd: User@103</p>
-          </div>
-          <span class="text-xs font-bold text-sky-600">Enter &rarr;</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast Container -->
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 
-  <!-- Scripts -->
   <script src="assets/js/firebase-config.js"></script>
   <script src="assets/js/app.js"></script>
 </body>
