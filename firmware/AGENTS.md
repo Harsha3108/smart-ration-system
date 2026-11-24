@@ -27,3 +27,8 @@
 ## Self-Contained Library Policy
 - Local copies of `HX711`, `LiquidCrystal_I2C`, and `Adafruit_Fingerprint` are bundled inside `SmartRationSystem/` and `tools/` using `"..."` quotes so Arduino IDE compiles without global library setup errors.
 - Keep `platformio.ini` dependencies aligned with `SmartRationSystem.ino`.
+
+## Build & ESP32 Core 3.x Compatibility Rules
+- **Arduino Core 3.x LEDC API:** `platform = espressif32` (`8.0.0` / Core `3.3.12`) removes legacy `ledcSetup`/`ledcAttachPin`/`ledcDetachPin`. Always pin `madhephaestus/ESP32Servo @ ^3.0.5` (never `1.x`).
+- **Bundled Header Standards:** Use `0b...` binary literals (not deprecated `B...` macros), keep all HD44780 flags (`LCD_4BITMODE`, `LCD_2LINE`, `LCD_5x8DOTS`, `LCD_DISPLAYMOVE`, `LCD_MOVELEFT`, `LCD_MOVERIGHT`) in `LiquidCrystal_I2C.h`, and type `device_address` as `uint32_t` in `Adafruit_Fingerprint.h`.
+- **Version Control Hygiene:** Never commit `firmware/.pio/`, `.pio/`, `*.bin`, or `*.elf` build caches; keep them listed in `.gitignore`.
