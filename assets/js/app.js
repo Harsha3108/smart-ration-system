@@ -275,9 +275,11 @@ function initFirebaseListeners() {
       const demoToggle = document.getElementById('setting-demo-mode');
       const demoRatio = document.getElementById('setting-demo-ratio');
       const demoPill = document.getElementById('demo-mode-pill');
+      const smsKeyInput = document.getElementById('setting-sms-key');
       if (calInput && data.calibrationFactor) calInput.value = data.calibrationFactor;
       if (demoToggle) demoToggle.checked = data.demoMode !== false;
       if (demoRatio && data.demoRatio) demoRatio.value = String(data.demoRatio);
+      if (smsKeyInput && data.smsApiKey !== undefined) smsKeyInput.value = data.smsApiKey;
       if (demoPill) {
         demoPill.innerText = data.demoMode ? `DEMO SCALE 1:${data.demoRatio || 100}` : 'FULL SCALE 1:1';
       }
@@ -1180,6 +1182,19 @@ function saveHardwareSettings() {
     servoOpenAngle: parseInt(document.getElementById('setting-servo-open').value, 10) || 60
   };
   if (window.db) window.db.ref('system_config').update(data).then(() => showToast('Hardware settings synced to ESP32.', 'success'));
+}
+
+function saveSmsSettings() {
+  const smsApiKey = (document.getElementById('setting-sms-key')?.value || '').trim();
+  currentConfig.smsApiKey = smsApiKey;
+  if (window.db) {
+    window.db.ref('system_config').update({ smsApiKey })
+      .then(() => showToast('SMS API key saved to Firebase system_config.', 'success'))
+      .catch((err) => showToast('Failed to save SMS key: ' + err.message, 'error'));
+  } else {
+    localStorage.setItem('smart_ration_sms_key', smsApiKey);
+    showToast('SMS API key saved locally (Demo mode).', 'success');
+  }
 }
 
 function captureLiveRfid() {
