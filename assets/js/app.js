@@ -572,7 +572,10 @@ function addMemberRow(member = null) {
     <input type="number" min="1" max="120" value="${mAge}" title="Age" class="member-age w-14 p-1.5 text-xs rounded border border-slate-300 font-mono bg-white">
     <div class="flex items-center gap-1">
       <span class="text-[10px] font-bold text-slate-500">FP#</span>
-      <input type="number" min="1" max="127" value="${mFpId}" required class="member-fpid w-14 p-1.5 text-xs rounded border border-slate-300 font-mono font-bold text-slate-900 bg-white">
+      <input type="number" min="1" max="127" value="${mFpId}" required class="member-fpid w-12 p-1.5 text-xs rounded border border-slate-300 font-mono font-bold text-slate-900 bg-white">
+      <button type="button" onclick="triggerRemoteFingerprintEnroll(this)" title="Enroll finger on ESP32 R307 sensor" class="enroll-fp-btn px-2 py-1 text-[10px] font-semibold bg-blue-50 text-blue-800 border border-blue-200 rounded hover:bg-blue-100 whitespace-nowrap">
+        Enroll
+      </button>
     </div>
     <button type="button" onclick="this.closest('.member-row').remove()" class="p-1 text-slate-400 hover:text-rose-700"><i data-lucide="trash" class="w-4 h-4"></i></button>
   `;
@@ -1184,6 +1187,76 @@ function captureLiveRfid() {
     document.getElementById('input-rfid-uid').value = currentActiveSession.currentCardUid;
     showToast(`Captured UID: ${currentActiveSession.currentCardUid}`, 'success');
   } else { showToast('Tap an RFID card on the ESP32 reader first.', 'info'); }
+}
+
+function triggerRemoteFingerprintEnroll(btn) {
+  const row = btn.closest('.member-row');
+  const fpInput = row.querySelector('.member-fpid');
+  const nameInput = row.querySelector('.member-name');
+  const fpId = parseInt(fpInput.value, 10);
+  const memberName = (nameInput?.value || 'Member').trim();
+
+  if (!fpId || fpId < 1 || fpId > 127) {
+    showToast('Enter a valid FP# slot between 1 and 127 first.', 'error');
+    fpInput.focus();
+    return;
+  }
+
+  if (!window.db) {
+    showToast(`Demo mode: Enter FP# ${fpId} manually or connect Firebase + ESP32 R307 for live enrollment.`, 'info');
+    return;
+  }
+
+  const cmdRef = window.db.ref('system_config/enrollCmd');
+  btn.disabled = true;
+  btn.innerText = 'Scanning...';
+  btn.className = 'enroll-fp-btn px-2 py-1 text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-300 rounded whitespace-nowrap';
+
+  cmdRef.set({
+    fpId,
+    memberName,
+    status: 'PENDING',
+    message: `Place finger for ${memberName} (Slot #${fpId}) on R307 sensor...`,
+    requestedAt: Date.now()
+  }).then(() => {
+    showToast(`Enrollment requested for Slot #${fpId}. Place finger on R307 sensor...`, 'info');
+    let settled = false;
+    const resetBtn = (label, cls) => {
+      btn.disabled = false;
+      btn.innerText = label;
+      btn.className = cls;
+    };
+
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      cmdRef.off('value', listener);
+      resetBtn('Enroll', 'enroll-fp-btn px-2 py-1 text-[10px] font-semibold bg-blue-50 text-blue-800 border border-blue-200 rounded hover:bg-blue-100 whitespace-nowrap');
+      showToast('Enrollment timed out. Check ESP32 Wi-Fi and R307 wiring.', 'error');
+    }, 35000);
+
+    const listener = cmdRef.on('value', (snap) => {
+      const val = snap.val();
+      if (!val || settled) return;
+      if (val.status === 'SUCCESS') {
+        settled = true;
+        clearTimeout(timer);
+        cmdRef.off('value', listener);
+        resetBtn('Enrolled', 'enroll-fp-btn px-2 py-1 text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300 rounded whitespace-nowrap');
+        showToast(val.message || `Fingerprint enrolled in Slot #${fpId}!`, 'success');
+      } else if (val.status === 'ERROR') {
+        settled = true;
+        clearTimeout(timer);
+        cmdRef.off('value', listener);
+        resetBtn('Retry', 'enroll-fp-btn px-2 py-1 text-[10px] font-semibold bg-rose-100 text-rose-800 border border-rose-300 rounded whitespace-nowrap');
+        showToast(val.message || 'Fingerprint enrollment failed.', 'error');
+      }
+    });
+  }).catch((err) => {
+    btn.disabled = false;
+    btn.innerText = 'Enroll';
+    showToast('Firebase error: ' + err.message, 'error');
+  });
 }
 
 function switchPortal(portal) {
